@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Mail, Linkedin, MapPin, User, ExternalLink, Eye, ArrowLeft, Building2, Briefcase, GraduationCap, UserCheck } from "lucide-react"
+import { Mail, Linkedin, MapPin, User, ExternalLink, Eye, ArrowLeft, Briefcase, GraduationCap, UserCheck } from "lucide-react"
 import type { ContactInfo } from "@/types/dashboard"
 
 interface ContactViewProps {
@@ -49,19 +49,19 @@ export function ContactView({ contacts }: ContactViewProps) {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30 hover:bg-muted/30">
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground pl-6">
+                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground pl-6">
                   Name
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Designation
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Email
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   LinkedIn
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center pr-6">
+                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground text-center pr-6">
                   Profile
                 </TableHead>
               </TableRow>
@@ -75,16 +75,13 @@ export function ContactView({ contacts }: ContactViewProps) {
                   <TableCell className="pl-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 bg-gradient-to-br from-brand-blue to-brand-blue-light rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-xs font-bold text-white">
+                        <span className="text-xs font-semibold text-white">
                           {contact.firstName[0]}{contact.lastName[0]}
                         </span>
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-foreground">
-                          {contact.firstName} {contact.lastName}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{contact.entityName}</p>
-                      </div>
+                      <p className="text-sm font-medium text-foreground">
+                        {contact.firstName} {contact.lastName}
+                      </p>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -163,20 +160,20 @@ function ContactDetailView({
       {/* Profile Header with Contact Info */}
       <Card className="border-border/60 shadow-sm overflow-hidden">
         <div className="bg-gradient-to-r from-brand-blue/8 to-brand-blue/3 border-b border-border/60 px-6 py-6">
-          <div className="flex items-start justify-between gap-6">
+          <div className="flex items-center justify-between gap-6">
             <div className="flex items-center gap-5">
-              <div className="w-16 h-16 bg-gradient-to-br from-brand-blue to-brand-blue-light rounded-full flex items-center justify-center shadow-md">
-                <span className="text-xl font-bold text-white">
+              <div className="w-14 h-14 bg-gradient-to-br from-brand-blue to-brand-blue-light rounded-full flex items-center justify-center shadow-md flex-shrink-0">
+                <span className="text-lg font-semibold text-white">
                   {contact.firstName[0]}{contact.lastName[0]}
                 </span>
               </div>
-              <div>
-                <h2 className="text-xl font-semibold text-foreground">
+              <div className="flex flex-col justify-center">
+                <h2 className="text-xl font-semibold text-foreground leading-tight">
                   {contact.firstName} {contact.lastName}
                 </h2>
-                <Badge className="mt-1.5 bg-brand-blue/8 text-brand-blue hover:bg-brand-blue/12 border-0 text-xs font-medium leading-normal py-1 px-2.5">
+                <p className="text-sm text-brand-blue font-medium mt-1">
                   {contact.designation}
-                </Badge>
+                </p>
               </div>
             </div>
             <div className="flex flex-col items-end gap-2 flex-shrink-0">
@@ -207,14 +204,7 @@ function ContactDetailView({
       </Card>
 
       {/* Details Grid */}
-      <div className="grid sm:grid-cols-2 gap-4">
-        <DetailCard label="Account">
-          <div className="flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-brand-blue" />
-            <span className="text-sm font-medium text-foreground">{contact.accountName}</span>
-          </div>
-        </DetailCard>
-
+      <div className="grid sm:grid-cols-1 gap-4">
         <DetailCard label="Location">
           <div className="flex items-start gap-2">
             <MapPin className="w-4 h-4 text-brand-orange mt-0.5" />
@@ -238,11 +228,11 @@ function ContactDetailView({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {contact.currentProfile.map((point, idx) => (
                 <div key={idx} className="flex items-start gap-2.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-brand-blue mt-2 flex-shrink-0" />
-                  <p className="text-sm text-muted-foreground leading-relaxed">{point}</p>
+                  <div className="w-1.5 h-1.5 rounded-full bg-brand-blue mt-[7px] flex-shrink-0" />
+                  <p className="text-sm text-foreground/80 leading-relaxed">{point}</p>
                 </div>
               ))}
             </div>
@@ -264,10 +254,10 @@ function ContactDetailView({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {contact.career.map((role, idx) => (
                   <div key={idx} className="flex items-start gap-2.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-brand-orange mt-2 flex-shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-brand-orange mt-[7px] flex-shrink-0" />
                     <p className="text-sm text-foreground/80 leading-relaxed">{role}</p>
                   </div>
                 ))}
@@ -288,10 +278,10 @@ function ContactDetailView({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {contact.qualifications.map((qual, idx) => (
                   <div key={idx} className="flex items-start gap-2.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-brand-orange mt-2 flex-shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-brand-orange mt-[7px] flex-shrink-0" />
                     <p className="text-sm text-foreground/80 leading-relaxed">{qual}</p>
                   </div>
                 ))}
@@ -313,8 +303,8 @@ function DetailCard({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl bg-muted/30 border border-border/40 p-4">
-      <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1.5">{label}</p>
+    <div className="rounded-xl bg-card border border-border/60 p-4 shadow-sm">
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">{label}</p>
       {children}
     </div>
   )

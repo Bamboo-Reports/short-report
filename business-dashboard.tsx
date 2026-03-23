@@ -59,16 +59,6 @@ export default function BusinessDashboard({ data }: { data?: DashboardData }) {
         <div className="px-6 sm:px-8 py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-5">
-              <Button
-                onClick={() => navigateView("prev")}
-                variant="ghost"
-                size="sm"
-                className="w-9 h-9 p-0 text-white/70 hover:text-white hover:bg-white/10 rounded-lg"
-                aria-label="Previous view"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </Button>
-
               <div className="w-11 h-11 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/20">
                 <CurrentIcon className="w-5 h-5 text-white" />
               </div>
@@ -80,15 +70,26 @@ export default function BusinessDashboard({ data }: { data?: DashboardData }) {
                 <p className="text-sm text-white/70 mt-0.5">{VIEWS[currentViewIndex].subtitle}</p>
               </div>
 
-              <Button
-                onClick={() => navigateView("next")}
-                variant="ghost"
-                size="sm"
-                className="w-9 h-9 p-0 text-white/70 hover:text-white hover:bg-white/10 rounded-lg"
-                aria-label="Next view"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </Button>
+              <div className="flex items-center gap-0.5 ml-1">
+                <Button
+                  onClick={() => navigateView("prev")}
+                  variant="ghost"
+                  size="sm"
+                  className="w-8 h-8 p-0 text-white/70 hover:text-white hover:bg-white/10 rounded-lg"
+                  aria-label="Previous view"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <Button
+                  onClick={() => navigateView("next")}
+                  variant="ghost"
+                  size="sm"
+                  className="w-8 h-8 p-0 text-white/70 hover:text-white hover:bg-white/10 rounded-lg"
+                  aria-label="Next view"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
 
             <div className="hidden sm:flex items-center gap-1">
@@ -130,7 +131,7 @@ export default function BusinessDashboard({ data }: { data?: DashboardData }) {
                     flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-lg transition-all duration-200
                     ${isActive
                       ? "bg-background text-foreground shadow-sm"
-                      : "text-white/60 hover:text-white hover:bg-white/8"
+                      : "text-white/60 hover:text-white hover:bg-white/10"
                     }
                   `}
                 >
@@ -152,10 +153,10 @@ export default function BusinessDashboard({ data }: { data?: DashboardData }) {
         </div>
 
         {/* Footer */}
-        <footer className="border-t border-border/60 mt-2">
-          <div className="max-w-[1400px] mx-auto px-6 sm:px-8 py-4 flex items-center justify-between">
+        <footer className="border-t border-border/60 mt-6">
+          <div className="max-w-[1400px] mx-auto px-6 sm:px-8 py-5 flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground tracking-wide uppercase">
-              Confidential &middot; 2025
+              Confidential &middot; {new Date().getFullYear()}
             </span>
             <div className="flex items-center gap-4">
               <span className="text-xs text-muted-foreground">

@@ -1,9 +1,9 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import {
   Building2,
+  Briefcase,
   Calendar,
   DollarSign,
   Users,
@@ -12,6 +12,7 @@ import {
   Lock,
   TrendingUp,
   Crown,
+  Shield,
   Swords,
   Banknote,
   BarChart3,
@@ -28,12 +29,24 @@ export function BusinessView({ businessInfo }: BusinessViewProps) {
     <div className="px-6 sm:px-8 py-6">
       <div className="space-y-6">
         {/* Company Overview Strip */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <MetricCard
             icon={<Building2 className="w-5 h-5" />}
             label="Company"
             value={businessInfo.name}
             accent="blue"
+          />
+          <MetricCard
+            icon={<Shield className="w-5 h-5" />}
+            label="Industry"
+            value={businessInfo.industry}
+            accent="blue"
+          />
+          <MetricCard
+            icon={<Briefcase className="w-5 h-5" />}
+            label="Company Type"
+            value={businessInfo.companyType}
+            accent="orange"
           />
           <MetricCard
             icon={<Users className="w-5 h-5" />}
@@ -55,10 +68,10 @@ export function BusinessView({ businessInfo }: BusinessViewProps) {
           />
         </div>
 
-        {/* Row 1: Financials + Key Executives */}
-        <div className="grid lg:grid-cols-5 gap-6">
+        {/* Row 1: Financials + Financial Performance Chart */}
+        <div className="grid lg:grid-cols-2 gap-6">
           {/* Financials Block */}
-          <Card className="lg:col-span-2 border-border/60 shadow-sm">
+          <Card className="border-border/60 shadow-sm flex flex-col">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
                 <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
@@ -67,8 +80,8 @@ export function BusinessView({ businessInfo }: BusinessViewProps) {
                 Financial Highlights
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
+            <CardContent className="flex-1 flex flex-col">
+              <div className="grid grid-cols-2 gap-3 flex-1">
                 <FinancialMetric
                   label="Revenue"
                   value={businessInfo.financials.revenue}
@@ -90,14 +103,34 @@ export function BusinessView({ businessInfo }: BusinessViewProps) {
                   label="Stock Price"
                   value={businessInfo.financials.stockPrice}
                   icon={<Monitor className="w-4 h-4" />}
-                  ticker={businessInfo.stockTicker}
                 />
               </div>
             </CardContent>
           </Card>
 
+          {/* Financial Performance Chart */}
+          <RevenueChart ticker={businessInfo.stockTicker} />
+        </div>
+
+        {/* About */}
+        <Card className="border-border/60 shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
+              <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
+                <Building2 className="w-4 h-4 text-brand-blue" />
+              </div>
+              About
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-foreground/80 leading-relaxed">{businessInfo.about}</p>
+          </CardContent>
+        </Card>
+
+        {/* Row 3: Key Executives + Core Services + Competitors */}
+        <div className="grid lg:grid-cols-3 gap-6">
           {/* Key Executives */}
-          <Card className="lg:col-span-3 border-border/60 shadow-sm">
+          <Card className="border-border/60 shadow-sm">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
                 <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
@@ -107,69 +140,16 @@ export function BusinessView({ businessInfo }: BusinessViewProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-0.5">
+              <div className="space-y-1">
                 {businessInfo.executives.map((exec, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-muted/50 transition-colors group"
+                    className="flex items-start gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/50 transition-colors group"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
-                        index === 0
-                          ? "bg-gradient-to-br from-brand-orange to-brand-orange-light"
-                          : "bg-gradient-to-br from-brand-blue to-brand-blue-light"
-                      }`}>
-                        {exec.name.split(" ").map(n => n[0]).join("")}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">{exec.name}</p>
-                        <p className="text-xs text-muted-foreground">{exec.title}</p>
-                      </div>
-                    </div>
-                    {exec.since && (
-                      <Badge variant="outline" className="text-[10px] border-border/60 text-muted-foreground">
-                        Since {exec.since}
-                      </Badge>
-                    )}
+                    <div className="w-1.5 h-1.5 rounded-full bg-brand-blue group-hover:bg-brand-orange transition-colors flex-shrink-0 mt-[7px]" />
+                    <span className="text-sm text-foreground/80">{exec.name} – {exec.title}</span>
                   </div>
                 ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Row 2: Company Profile + Core Services + Competitors */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Company Profile */}
-          <Card className="border-border/60 shadow-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
-                <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
-                  <Building2 className="w-4 h-4 text-brand-blue" />
-                </div>
-                Company Profile
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <InfoField label="Company Type">
-                <Badge
-                  variant="outline"
-                  className="text-xs font-medium border-brand-blue/30 text-brand-blue bg-brand-blue/5"
-                >
-                  {businessInfo.companyType}
-                </Badge>
-              </InfoField>
-              <InfoField label="Industry">
-                <Badge className="text-xs font-medium bg-brand-orange/10 text-brand-orange hover:bg-brand-orange/15 border-0">
-                  {businessInfo.industry}
-                </Badge>
-              </InfoField>
-              <InfoField label="Stock Ticker">
-                <span className="text-sm font-mono font-bold text-brand-blue">{businessInfo.stockTicker}</span>
-              </InfoField>
-              <div className="pt-3 border-t border-border/60">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">About</p>
-                <p className="text-sm text-muted-foreground leading-relaxed">{businessInfo.about}</p>
               </div>
             </CardContent>
           </Card>
@@ -189,10 +169,10 @@ export function BusinessView({ businessInfo }: BusinessViewProps) {
                 {businessInfo.services.map((service, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/60 transition-colors group"
+                    className="flex items-start gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/60 transition-colors group"
                   >
-                    <div className="w-1.5 h-1.5 rounded-full bg-brand-blue group-hover:bg-brand-orange transition-colors flex-shrink-0" />
-                    <span className="text-sm font-medium text-foreground/80">{service}</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-brand-blue group-hover:bg-brand-orange transition-colors flex-shrink-0 mt-[7px]" />
+                    <span className="text-sm text-foreground/80">{service}</span>
                   </div>
                 ))}
               </div>
@@ -210,30 +190,20 @@ export function BusinessView({ businessInfo }: BusinessViewProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-0.5">
+              <div className="space-y-1">
                 {businessInfo.competitors.map((comp, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-muted/50 transition-colors"
+                    className="flex items-start gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/50 transition-colors group"
                   >
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">{comp.name}</p>
-                      <p className="text-xs text-muted-foreground">{comp.industry}</p>
-                    </div>
-                    {comp.marketCap && (
-                      <span className="text-xs font-mono font-semibold text-muted-foreground tabular-nums">
-                        {comp.marketCap}
-                      </span>
-                    )}
+                    <div className="w-1.5 h-1.5 rounded-full bg-brand-blue group-hover:bg-brand-orange transition-colors flex-shrink-0 mt-[7px]" />
+                    <span className="text-sm text-foreground/80">{comp.name}</span>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
         </div>
-
-        {/* Row 3: Financial Performance Chart */}
-        <RevenueChart ticker={businessInfo.stockTicker} />
       </div>
     </div>
   )
@@ -260,7 +230,7 @@ function MetricCard({
         </div>
         <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
       </div>
-      <p className="text-lg font-bold text-foreground tracking-tight truncate" title={value}>
+      <p className="text-lg text-foreground tracking-tight">
         {value}
       </p>
     </div>
@@ -271,42 +241,19 @@ function FinancialMetric({
   label,
   value,
   icon,
-  trend,
-  ticker,
 }: {
   label: string
   value: string
   icon: React.ReactNode
   trend?: "up" | "down"
-  ticker?: string
 }) {
   return (
-    <div className="rounded-xl bg-muted/40 border border-border/40 p-4">
+    <div className="rounded-xl bg-muted/40 border border-border/40 p-3.5 flex flex-col justify-between h-full">
       <div className="flex items-center gap-2 mb-2">
         <span className="text-brand-blue/60">{icon}</span>
-        <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
       </div>
-      <p className="text-xl font-bold text-foreground tabular-nums">{value}</p>
-      {ticker && (
-        <p className="text-[10px] font-mono text-muted-foreground mt-1">NASDAQ: {ticker}</p>
-      )}
-    </div>
-  )
-}
-
-function InfoField({
-  label,
-  value,
-  children,
-}: {
-  label: string
-  value?: string
-  children?: React.ReactNode
-}) {
-  return (
-    <div>
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">{label}</p>
-      {children || <p className="text-sm font-medium text-foreground">{value}</p>}
+      <p className="text-3xl font-semibold text-foreground tabular-nums leading-tight">{value}</p>
     </div>
   )
 }

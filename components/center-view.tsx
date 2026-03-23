@@ -49,25 +49,25 @@ export function CenterView({ centers }: CenterViewProps) {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30 hover:bg-muted/30">
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground pl-6">
+                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground pl-6">
                   Legal Name
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Location
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Type
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Est.
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-right">
+                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground text-right">
                   Employees
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Focus Regions
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center pr-6">
+                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground text-center pr-6">
                   Details
                 </TableHead>
               </TableRow>
@@ -85,7 +85,7 @@ export function CenterView({ centers }: CenterViewProps) {
                   <TableCell>
                     <div className="flex items-center gap-1.5">
                       <MapPin className="w-3.5 h-3.5 text-brand-orange flex-shrink-0" />
-                      <span className="text-sm text-foreground">{center.location}</span>
+                      <span className="text-sm font-medium text-foreground">{center.location}</span>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -100,10 +100,10 @@ export function CenterView({ centers }: CenterViewProps) {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm tabular-nums text-foreground">{center.incYear}</span>
+                    <span className="text-sm font-medium tabular-nums text-foreground">{center.incYear}</span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <span className="text-sm font-semibold tabular-nums text-foreground">
+                    <span className="text-sm font-medium tabular-nums text-foreground">
                       {center.employeeCount}
                     </span>
                   </TableCell>
@@ -113,7 +113,7 @@ export function CenterView({ centers }: CenterViewProps) {
                         <Badge
                           key={idx}
                           variant="outline"
-                          className="text-[10px] px-1.5 py-0 border-brand-blue-light/40 text-brand-blue bg-brand-blue/5"
+                          className="text-[11px] px-2 py-0.5 border-brand-blue-light/40 text-brand-blue bg-brand-blue/5"
                         >
                           {region}
                         </Badge>
@@ -169,91 +169,27 @@ function CenterDetailView({
         <div className="bg-gradient-to-r from-brand-blue/8 to-brand-blue/3 border-b border-border/60 px-6 py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-brand-blue/10 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-brand-blue/10 flex items-center justify-center flex-shrink-0">
                 <Building2 className="w-6 h-6 text-brand-blue" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-foreground">{center.location} Center</h2>
-                <p className="text-sm text-muted-foreground mt-0.5">{center.accountName}</p>
+                <h2 className="text-xl font-semibold text-foreground leading-tight">{center.legalName}</h2>
+                <p className="text-sm text-muted-foreground mt-1">{center.accountName}</p>
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge
-                className={`text-xs font-medium border-0 ${
-                  center.centerType === "GBS"
-                    ? "bg-brand-orange/10 text-brand-orange"
-                    : "bg-brand-blue/10 text-brand-blue"
-                }`}
-              >
-                {center.centerType}
-              </Badge>
-              <Badge variant="outline" className="text-xs border-border/80">
-                Est. {center.incYear}
-              </Badge>
-              <Badge variant="outline" className="text-xs border-border/80">
-                <Users className="w-3 h-3 mr-1" />
-                {center.employeeCount} employees
-              </Badge>
             </div>
           </div>
         </div>
       </Card>
 
       {/* Facts Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <FactCard label="Legal Name" value={center.legalName} />
-        <FactCard label="Account Name" value={center.accountName} />
-        <FactCard label="Address">
-          <p className="text-sm text-foreground/80 flex items-start gap-1.5">
-            <MapPin className="w-3.5 h-3.5 mt-0.5 text-brand-orange flex-shrink-0" />
-            <span>{center.address}</span>
-          </p>
-        </FactCard>
-        {center.phone ? (
-          <FactCard label="Phone">
-            <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5 text-brand-blue" />
-              {center.phone}
-            </p>
-          </FactCard>
-        ) : (
-          <FactCard label="Focus Regions">
-            <div className="flex flex-wrap gap-1.5">
-              {center.focusRegions.map((region, idx) => (
-                <Badge
-                  key={idx}
-                  variant="outline"
-                  className="text-xs px-2 py-0.5 border-brand-blue-light/40 text-brand-blue bg-brand-blue/5"
-                >
-                  <Globe className="w-3 h-3 mr-1" />
-                  {region}
-                </Badge>
-              ))}
-            </div>
-          </FactCard>
-        )}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <FactCard label="Location" value={center.location + ", India"} />
+        <FactCard label="Center Type" value={center.centerType} />
+        <FactCard label="Established" value={center.incYear} />
+        <FactCard label="Employees" value={center.employeeCount} />
       </div>
 
-      {/* Show Focus Regions separately if phone exists */}
-      {center.phone && (
-        <Card className="border-border/60 shadow-sm">
-          <CardContent className="p-5">
-            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Focus Regions</p>
-            <div className="flex flex-wrap gap-2">
-              {center.focusRegions.map((region, idx) => (
-                <Badge
-                  key={idx}
-                  variant="outline"
-                  className="text-xs px-2.5 py-1 border-brand-blue-light/40 text-brand-blue bg-brand-blue/5"
-                >
-                  <Globe className="w-3 h-3 mr-1.5" />
-                  {region}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+
 
       {/* Services */}
       <Card className="border-border/60 shadow-sm">
@@ -317,8 +253,8 @@ function FactCard({
   children?: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl bg-muted/30 border border-border/40 p-4">
-      <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1.5">{label}</p>
+    <div className="rounded-xl bg-card border border-border/60 p-4 shadow-sm">
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">{label}</p>
       {children || <p className="text-sm font-medium text-foreground">{value}</p>}
     </div>
   )
@@ -342,14 +278,14 @@ function ServiceCategory({
     }`}>
       <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border/40">
         {isTech && <Cpu className="w-3.5 h-3.5 text-brand-orange" />}
-        <h4 className={`text-sm font-semibold ${isTech ? "text-brand-orange" : "text-foreground"}`}>
+        <h4 className={`text-sm font-medium ${isTech ? "text-brand-orange" : "text-foreground"}`}>
           {title}
         </h4>
       </div>
       <ul className="space-y-1.5">
         {items.map((item, idx) => (
-          <li key={idx} className="flex items-start gap-2 text-xs text-foreground/70">
-            <div className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${
+          <li key={idx} className="flex items-start gap-2 text-sm text-foreground/80">
+            <div className={`w-1.5 h-1.5 rounded-full mt-[7px] flex-shrink-0 ${
               isTech ? "bg-brand-orange" : "bg-brand-blue"
             }`} />
             <span className="leading-relaxed">{item}</span>

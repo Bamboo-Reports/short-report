@@ -121,39 +121,7 @@ export function RevenueChart({ ticker }: RevenueChartProps) {
           </ChartContainer>
         )}
 
-        {!loading && !error && data && (
-          <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-border/60">
-            <LiveMetric
-              label="Current Price"
-              value={data.stockPrice != null ? `$${data.stockPrice.toFixed(2)}` : "N/A"}
-            />
-            <LiveMetric
-              label="Market Cap"
-              value={data.marketCap != null ? formatLargeNumber(data.marketCap) : "N/A"}
-            />
-            <LiveMetric
-              label="Total Revenue"
-              value={data.revenue != null ? formatLargeNumber(data.revenue) : "N/A"}
-            />
-          </div>
-        )}
       </CardContent>
     </Card>
   )
-}
-
-function LiveMetric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="text-center">
-      <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
-      <p className="text-sm font-bold text-foreground mt-0.5 tabular-nums">{value}</p>
-    </div>
-  )
-}
-
-function formatLargeNumber(num: number): string {
-  if (num >= 1e12) return `$${(num / 1e12).toFixed(1)}T`
-  if (num >= 1e9) return `$${(num / 1e9).toFixed(1)}B`
-  if (num >= 1e6) return `$${(num / 1e6).toFixed(0)}M`
-  return `$${num.toLocaleString()}`
 }
