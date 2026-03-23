@@ -21,6 +21,27 @@ export const DEFAULT_BUSINESS: BusinessInfo = {
     twitter: "https://x.com/zscaler",
     instagram: "https://instagram.com/zscaler",
   },
+  stockTicker: "ZS",
+  financials: {
+    revenue: "$2,167 Mn",
+    netIncome: "$430 Mn",
+    marketCap: "$31.2 Bn",
+    stockPrice: "$213.45",
+  },
+  executives: [
+    { name: "Jay Chaudhry", title: "Chairman & CEO", since: "2007" },
+    { name: "Remo Canessa", title: "Chief Financial Officer", since: "2012" },
+    { name: "Robert Schlossman", title: "Chief Legal Officer", since: "2020" },
+    { name: "Dali Rajic", title: "Chief Revenue Officer", since: "2022" },
+    { name: "Deepen Desai", title: "Chief Security Officer", since: "2021" },
+  ],
+  competitors: [
+    { name: "Palo Alto Networks", industry: "Cybersecurity", marketCap: "$120.5 Bn" },
+    { name: "CrowdStrike", industry: "Endpoint Security", marketCap: "$74.2 Bn" },
+    { name: "Fortinet", industry: "Network Security", marketCap: "$58.9 Bn" },
+    { name: "Cloudflare", industry: "Web Security", marketCap: "$35.1 Bn" },
+    { name: "Check Point Software", industry: "Cybersecurity", marketCap: "$18.7 Bn" },
+  ],
 }
 
 export const DEFAULT_CENTERS: CenterInfo[] = [
@@ -128,6 +149,22 @@ export const DEFAULT_CONTACTS: ContactInfo[] = [
     state: "Karnataka",
     country: "India",
     linkedin: "linkedin.com/in/gautamvishal",
+    career: [
+      "Former Head of APAC Payments & Head of Global Verification and Compliance at Stripe",
+      "Former Senior Engineering Leader at Amazon",
+      "Former Software Development Manager III at Amazon",
+      "Former Manager Technology at SapientNitro",
+      "Former Project Lead at UnitedHealthcare",
+    ],
+    currentProfile: [
+      "Currently serving as VP of Engineering & Site Managing Director at Zscaler India, responsible for scaling the India Development Center.",
+      "In this role, he leads engineering strategy and execution for cloud security initiatives, while driving growth and operational excellence in Zscaler's India tech hub.",
+    ],
+    qualifications: [
+      "B.Tech in Computer Science from Gurukula Kangri Vishwavidyalaya (2000-2004)",
+      "I.Sc. in Physics, Chemistry, Mathematics from Science College, Patna (1997-1999)",
+      "10th grade with PCM from Don Bosco Academy, Patna (1997)",
+    ],
   },
   {
     accountName: "Zscaler Inc.",
@@ -140,6 +177,19 @@ export const DEFAULT_CONTACTS: ContactInfo[] = [
     state: "Karnataka",
     country: "India",
     linkedin: "linkedin.com/in/kirankumardg",
+    career: [
+      "Former Senior Engineering Manager at Cisco Systems",
+      "Former Technical Lead at Juniper Networks",
+      "Former Software Engineer at Wipro Technologies",
+    ],
+    currentProfile: [
+      "Currently serving as Director of Engineering at Zscaler, leading a team focused on Zero Trust Exchange platform development.",
+      "Drives architecture decisions for cloud-native security solutions and oversees cross-functional engineering delivery across multiple product lines.",
+    ],
+    qualifications: [
+      "M.Tech in Computer Science & Engineering from IIT Bombay (2008-2010)",
+      "B.E. in Information Science from RVCE, Bengaluru (2003-2007)",
+    ],
   },
   {
     accountName: "Zscaler Inc.",
@@ -152,6 +202,20 @@ export const DEFAULT_CONTACTS: ContactInfo[] = [
     state: "Karnataka",
     country: "India",
     linkedin: "linkedin.com/in/sauravmware",
+    career: [
+      "Former Senior Engineering Manager at VMware",
+      "Former Staff Engineer at VMware",
+      "Former Technical Lead at Oracle",
+      "Former Software Developer at Infosys",
+    ],
+    currentProfile: [
+      "Currently serving as Director of Engineering at Zscaler, overseeing the Data Protection engineering team.",
+      "Responsible for building scalable DLP and CASB solutions, driving innovation in cloud data security, and managing a team of 50+ engineers across multiple product verticals.",
+    ],
+    qualifications: [
+      "M.S. in Computer Science from University of Texas at Dallas (2010-2012)",
+      "B.Tech in Electronics & Communication from NIT Warangal (2004-2008)",
+    ],
   },
   {
     accountName: "Zscaler Inc.",
@@ -164,6 +228,20 @@ export const DEFAULT_CONTACTS: ContactInfo[] = [
     state: "Telangana",
     country: "India",
     linkedin: "linkedin.com/in/kishorethakur",
+    career: [
+      "Former Head of SRE at Nutanix",
+      "Former Principal SRE Manager at Microsoft Azure",
+      "Former Senior DevOps Lead at Salesforce",
+      "Former Systems Architect at Yahoo!",
+    ],
+    currentProfile: [
+      "Currently serving as Senior Director of Site Reliability Engineering at Zscaler, leading the Hyderabad SRE center.",
+      "Oversees platform reliability, incident management, and infrastructure automation for Zscaler's global cloud security platform processing 400B+ daily transactions.",
+    ],
+    qualifications: [
+      "M.Tech in Distributed Systems from IIIT Hyderabad (2006-2008)",
+      "B.Tech in Computer Science from JNTU Hyderabad (2001-2005)",
+    ],
   },
   {
     accountName: "Zscaler Inc.",
@@ -176,5 +254,20 @@ export const DEFAULT_CONTACTS: ContactInfo[] = [
     state: "Karnataka",
     country: "India",
     linkedin: "linkedin.com/in/satish-sreenivasaiah-b661983/",
+    career: [
+      "Former Security Engineering Manager at Palo Alto Networks",
+      "Former Senior Security Engineer at Symantec",
+      "Former Application Security Lead at Flipkart",
+      "Former Security Analyst at TCS",
+    ],
+    currentProfile: [
+      "Currently serving as Director of Product Security Engineering at Zscaler, leading security assurance for the entire product portfolio.",
+      "Responsible for application security, vulnerability management, penetration testing, and secure SDLC practices across all engineering teams.",
+    ],
+    qualifications: [
+      "M.S. in Information Security from Carnegie Mellon University (2011-2013)",
+      "B.E. in Computer Science from BMS College of Engineering, Bengaluru (2005-2009)",
+      "CISSP, OSCP, CEH Certified",
+    ],
   },
 ]

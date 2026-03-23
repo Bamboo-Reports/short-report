@@ -15,6 +15,10 @@ export interface BusinessData {
   linkedin?: string
   twitter?: string
   instagram?: string
+  stockTicker?: string
+  netIncome?: string
+  marketCap?: string
+  stockPrice?: string
 }
 
 export interface BusinessInfo {
@@ -28,6 +32,39 @@ export interface BusinessInfo {
   services: string[]
   about: string
   socialLinks: SocialLinks
+  stockTicker: string
+  financials: FinancialInfo
+  executives: ExecutiveInfo[]
+  competitors: CompetitorInfo[]
+}
+
+export interface FinancialInfo {
+  revenue: string
+  netIncome: string
+  marketCap: string
+  stockPrice: string
+}
+
+export interface ExecutiveInfo {
+  name: string
+  title: string
+  since?: string
+}
+
+export interface CompetitorInfo {
+  name: string
+  industry: string
+  marketCap?: string
+}
+
+export interface FinanceApiResponse {
+  ticker: string
+  stockPrice: number | null
+  marketCap: number | null
+  currency: string
+  revenue: number | null
+  netIncome: number | null
+  priceHistory: { year: string; avgPrice: number }[]
 }
 
 export interface SocialLinks {
@@ -82,6 +119,9 @@ export interface ContactData {
   state?: string
   country?: string
   linkedin?: string
+  career?: string
+  currentProfile?: string
+  qualification?: string
 }
 
 export interface ContactInfo {
@@ -95,6 +135,9 @@ export interface ContactInfo {
   state: string
   country: string
   linkedin: string
+  career: string[]
+  currentProfile: string[]
+  qualifications: string[]
 }
 
 export interface DashboardData {

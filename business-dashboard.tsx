@@ -53,51 +53,51 @@ export default function BusinessDashboard({ data }: { data?: DashboardData }) {
   }
 
   return (
-    <div className="bg-gradient-to-br from-slate-50 to-slate-100 font-['Inter'] h-screen overflow-hidden p-2">
-      <div className="mx-auto max-w-full h-full overflow-y-auto flex flex-col">
-        {/* Header with Navigation */}
-        <div className="bg-white rounded-t-2xl shadow-sm border border-slate-200 flex-shrink-0">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 gap-4">
-            <div className="flex items-center gap-4 flex-1">
+    <div className="bg-background min-h-screen h-screen overflow-hidden flex flex-col">
+      {/* Executive Header */}
+      <header className="flex-shrink-0 bg-gradient-to-r from-brand-blue to-[#015a8f] text-white">
+        <div className="px-6 sm:px-8 py-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-5">
               <Button
                 onClick={() => navigateView("prev")}
                 variant="ghost"
                 size="sm"
-                className="w-8 h-8 p-0 hover:bg-slate-100"
+                className="w-9 h-9 p-0 text-white/70 hover:text-white hover:bg-white/10 rounded-lg"
                 aria-label="Previous view"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-5 h-5" />
               </Button>
 
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
-                <CurrentIcon className="w-6 h-6 text-white" />
+              <div className="w-11 h-11 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/20">
+                <CurrentIcon className="w-5 h-5 text-white" />
               </div>
 
-              <div className="flex-1">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900">
+              <div>
+                <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">
                   {VIEWS[currentViewIndex].title}
                 </h1>
-                <p className="text-sm text-slate-600 mt-1">{VIEWS[currentViewIndex].subtitle}</p>
+                <p className="text-sm text-white/70 mt-0.5">{VIEWS[currentViewIndex].subtitle}</p>
               </div>
 
               <Button
                 onClick={() => navigateView("next")}
                 variant="ghost"
                 size="sm"
-                className="w-8 h-8 p-0 hover:bg-slate-100"
+                className="w-9 h-9 p-0 text-white/70 hover:text-white hover:bg-white/10 rounded-lg"
                 aria-label="Next view"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-5 h-5" />
               </Button>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-1">
               {SOCIAL_ICONS.map(({ key, icon: Icon, label }) => (
                 <Button
                   key={key}
                   variant="ghost"
                   size="sm"
-                  className="w-8 h-8 p-0 hover:bg-slate-100"
+                  className="w-9 h-9 p-0 text-white/60 hover:text-white hover:bg-white/10 rounded-lg"
                   aria-label={label}
                   asChild
                 >
@@ -106,46 +106,65 @@ export default function BusinessDashboard({ data }: { data?: DashboardData }) {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <Icon className="w-4 h-4 text-slate-600" />
+                    <Icon className="w-4 h-4" />
                   </a>
                 </Button>
               ))}
             </div>
           </div>
+        </div>
 
-          {/* View Indicator */}
-          <div className="flex justify-center pb-4">
-            <div className="flex gap-2" role="tablist" aria-label="Dashboard views">
-              {VIEWS.map((view, index) => (
+        {/* Tab Navigation */}
+        <div className="px-6 sm:px-8">
+          <nav className="flex gap-1" role="tablist" aria-label="Dashboard views">
+            {VIEWS.map((view) => {
+              const isActive = view.key === currentView
+              const ViewIcon = view.icon
+              return (
                 <button
                   key={view.key}
                   onClick={() => setCurrentView(view.key)}
                   role="tab"
-                  aria-selected={index === currentViewIndex}
-                  aria-label={view.title}
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    index === currentViewIndex ? "bg-blue-600" : "bg-slate-300"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
+                  aria-selected={isActive}
+                  className={`
+                    flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-lg transition-all duration-200
+                    ${isActive
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-white/60 hover:text-white hover:bg-white/8"
+                    }
+                  `}
+                >
+                  <ViewIcon className="w-4 h-4" />
+                  <span className="hidden sm:inline">{view.title}</span>
+                </button>
+              )
+            })}
+          </nav>
         </div>
+      </header>
 
-        {/* Main Content */}
-        <div className="bg-white rounded-b-2xl shadow-sm border-x border-b border-slate-200">
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto">
+        <div className="max-w-[1400px] mx-auto">
           {currentView === "business" && <BusinessView businessInfo={businessInfo} />}
           {currentView === "center" && <CenterView centers={centerInfo} />}
           {currentView === "contact" && <ContactView contacts={contactInfo} />}
+        </div>
 
-          {/* Footer */}
-          <div className="px-4 sm:px-6 pb-4">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200">
-              <span className="text-xs text-slate-500">Confidential 2025</span>
+        {/* Footer */}
+        <footer className="border-t border-border/60 mt-2">
+          <div className="max-w-[1400px] mx-auto px-6 sm:px-8 py-4 flex items-center justify-between">
+            <span className="text-xs font-medium text-muted-foreground tracking-wide uppercase">
+              Confidential &middot; 2025
+            </span>
+            <div className="flex items-center gap-4">
+              <span className="text-xs text-muted-foreground">
+                Page {currentViewIndex + 1} of {VIEWS.length}
+              </span>
             </div>
           </div>
-        </div>
-      </div>
+        </footer>
+      </main>
     </div>
   )
 }

@@ -30,6 +30,15 @@ export function getBusinessInfo(data?: DashboardData): BusinessInfo {
       twitter: b.twitter || DEFAULT_BUSINESS.socialLinks.twitter,
       instagram: b.instagram || DEFAULT_BUSINESS.socialLinks.instagram,
     },
+    stockTicker: b.stockTicker || DEFAULT_BUSINESS.stockTicker,
+    financials: {
+      revenue: b.revenue || DEFAULT_BUSINESS.financials.revenue,
+      netIncome: b.netIncome || DEFAULT_BUSINESS.financials.netIncome,
+      marketCap: b.marketCap || DEFAULT_BUSINESS.financials.marketCap,
+      stockPrice: b.stockPrice || DEFAULT_BUSINESS.financials.stockPrice,
+    },
+    executives: DEFAULT_BUSINESS.executives,
+    competitors: DEFAULT_BUSINESS.competitors,
   }
 }
 
@@ -77,5 +86,16 @@ export function getContactInfo(data?: DashboardData): ContactInfo[] {
     state: c.state || "State",
     country: c.country || "Country",
     linkedin: c.linkedin || "",
+    career: parseBulletString(c.career),
+    currentProfile: parseBulletString(c.currentProfile),
+    qualifications: parseBulletString(c.qualification),
   }))
+}
+
+function parseBulletString(value?: string): string[] {
+  if (!value) return []
+  return value
+    .split("\n")
+    .map((line) => line.replace(/^[•\-\s]+/, "").trim())
+    .filter(Boolean)
 }
