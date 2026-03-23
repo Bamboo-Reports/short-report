@@ -1,14 +1,10 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import {
-  Download,
-  Maximize2,
-  Minimize2,
   Globe,
   Linkedin,
   Twitter,
@@ -23,22 +19,14 @@ import {
   Lock,
   ChevronLeft,
   ChevronRight,
-  FileText,
-  ImageIcon,
 } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import html2canvas from "html2canvas"
-import jsPDF from "jspdf"
 import { CenterView as OfficeCenterView } from "./center-view"
 import { ContactView as OfficeContactView } from "./contact-view"
 
 type ViewType = "business" | "center" | "contact"
 
 export default function BusinessDashboard({ data }: { data?: any }) {
-  const dashboardRef = useRef<HTMLDivElement>(null)
-  const [isFullscreen, setIsFullscreen] = useState(false)
   const [currentView, setCurrentView] = useState<ViewType>("business")
-  const [isExporting, setIsExporting] = useState(false)
 
   const views = [
     { key: "business" as ViewType, title: "Business Snapshot", subtitle: "Company Overview & Analytics" },
@@ -54,94 +42,6 @@ export default function BusinessDashboard({ data }: { data?: any }) {
         ? (currentViewIndex - 1 + views.length) % views.length
         : (currentViewIndex + 1) % views.length
     setCurrentView(views[newIndex].key)
-  }
-
-  const downloadAsPNG = async () => {
-    if (dashboardRef.current) {
-      setIsExporting(true)
-      try {
-        const canvas = await html2canvas(dashboardRef.current, {
-          backgroundColor: "#ffffff",
-          scale: 2,
-          useCORS: true,
-          allowTaint: true,
-        })
-
-        const link = document.createElement("a")
-        link.download = `zscaler-${currentView}-dashboard.png`
-        link.href = canvas.toDataURL()
-        link.click()
-      } catch (error) {
-        console.error("Error generating PNG:", error)
-      } finally {
-        setIsExporting(false)
-      }
-    }
-  }
-
-  const downloadAsPDF = async () => {
-    if (dashboardRef.current) {
-      setIsExporting(true)
-      try {
-        const canvas = await html2canvas(dashboardRef.current, {
-          backgroundColor: "#ffffff",
-          scale: 2,
-          useCORS: true,
-          allowTaint: true,
-        })
-
-        const imgData = canvas.toDataURL("image/png")
-        const pdf = new jsPDF({
-          orientation: canvas.width > canvas.height ? "landscape" : "portrait",
-          unit: "px",
-          format: [canvas.width, canvas.height],
-        })
-
-        pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height)
-
-        // Add clickable links for contact view
-        if (currentView === "contact") {
-          await addPDFLinks(pdf, dashboardRef.current)
-        }
-
-        pdf.save(`zscaler-${currentView}-dashboard.pdf`)
-      } catch (error) {
-        console.error("Error generating PDF:", error)
-      } finally {
-        setIsExporting(false)
-      }
-    }
-  }
-
-  const addPDFLinks = async (pdf: jsPDF, element: HTMLElement) => {
-    const links = element.querySelectorAll("a[href]")
-    const rect = element.getBoundingClientRect()
-
-    links.forEach((link) => {
-      const linkRect = link.getBoundingClientRect()
-      const href = link.getAttribute("href")
-
-      if (href) {
-        // Calculate relative position within the dashboard
-        const x = (linkRect.left - rect.left) * 2 // Scale factor of 2 from html2canvas
-        const y = (linkRect.top - rect.top) * 2
-        const width = linkRect.width * 2
-        const height = linkRect.height * 2
-
-        // Add clickable link to PDF
-        pdf.link(x, y, width, height, { url: href.startsWith("http") ? href : `https://${href}` })
-      }
-    })
-  }
-
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      dashboardRef.current?.requestFullscreen()
-      setIsFullscreen(true)
-    } else {
-      document.exitFullscreen()
-      setIsFullscreen(false)
-    }
   }
 
   const getBusinessData = () => {
@@ -178,13 +78,8 @@ export default function BusinessDashboard({ data }: { data?: any }) {
   }
 
   return (
-    <div
-      className={`bg-gradient-to-br from-slate-50 to-slate-100 font-['Inter'] ${isFullscreen ? "h-screen overflow-hidden p-2" : "min-h-screen p-4"}`}
-    >
-      <div
-        ref={dashboardRef}
-        className={`mx-auto transition-all duration-300 ${isFullscreen ? "max-w-full h-full overflow-y-auto flex flex-col" : "max-w-7xl"}`}
-      >
+    <div className="bg-gradient-to-br from-slate-50 to-slate-100 font-['Inter'] h-screen overflow-hidden p-2">
+      <div className="mx-auto max-w-full h-full overflow-y-auto flex flex-col">
         {/* Header with Navigation */}
         <div className="bg-white rounded-t-2xl shadow-sm border border-slate-200 flex-shrink-0">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 gap-4">
@@ -195,7 +90,6 @@ export default function BusinessDashboard({ data }: { data?: any }) {
                 variant="ghost"
                 size="sm"
                 className="w-8 h-8 p-0 hover:bg-slate-100"
-                disabled={isExporting}
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
@@ -219,7 +113,6 @@ export default function BusinessDashboard({ data }: { data?: any }) {
                 variant="ghost"
                 size="sm"
                 className="w-8 h-8 p-0 hover:bg-slate-100"
-                disabled={isExporting}
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>
@@ -248,53 +141,6 @@ export default function BusinessDashboard({ data }: { data?: any }) {
                   </a>
                 </Button>
               </div>
-
-              <Separator orientation="vertical" className="h-6" />
-
-              <div className="flex items-center gap-2">
-                {/* Export Dropdown */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-2 bg-transparent" disabled={isExporting}>
-                      <Download className="w-4 h-4" />
-                      <span className="hidden sm:inline">{isExporting ? "Exporting..." : "Export"}</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={downloadAsPNG} className="gap-2">
-                      <ImageIcon className="w-4 h-4" />
-                      Export as PNG
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={downloadAsPDF} className="gap-2">
-                      <FileText className="w-4 h-4" />
-                      Export as PDF
-                      {currentView === "contact" && (
-                        <Badge variant="secondary" className="ml-2 text-xs">
-                          Links
-                        </Badge>
-                      )}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <Button
-                  onClick={toggleFullscreen}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 bg-transparent"
-                  disabled={isExporting}
-                >
-                  {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-                  <span className="hidden sm:inline">{isFullscreen ? "Exit" : "Full"}</span>
-                </Button>
-              </div>
-
-              <Badge
-                variant="secondary"
-                className="bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold"
-              >
-                Research NXT
-              </Badge>
             </div>
           </div>
 
@@ -305,10 +151,9 @@ export default function BusinessDashboard({ data }: { data?: any }) {
                 <button
                   key={view.key}
                   onClick={() => setCurrentView(view.key)}
-                  disabled={isExporting}
                   className={`w-2 h-2 rounded-full transition-colors ${
                     index === currentViewIndex ? "bg-blue-600" : "bg-slate-300"
-                  } ${isExporting ? "opacity-50" : ""}`}
+                  }`}
                 />
               ))}
             </div>
@@ -316,45 +161,24 @@ export default function BusinessDashboard({ data }: { data?: any }) {
         </div>
 
         {/* Main Content */}
-        <div
-          className={`bg-white rounded-b-2xl shadow-sm border-x border-b border-slate-200 ${isFullscreen ? "flex-1 overflow-y-auto" : ""}`}
-        >
-          {currentView === "business" && <BusinessView isFullscreen={isFullscreen} data={data} />}
+        <div className="bg-white rounded-b-2xl shadow-sm border-x border-b border-slate-200">
+          {currentView === "business" && <BusinessView data={data} />}
           {currentView === "center" && <OfficeCenterView data={data} />}
           {currentView === "contact" && <OfficeContactView data={data} />}
 
           {/* Footer */}
           <div className="px-4 sm:px-6 pb-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200">
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
-                  Research NXT
-                </Badge>
-                <span className="text-xs text-slate-500">Confidential 2025</span>
-              </div>
-              <p className="text-xs text-slate-500 text-center sm:text-right">
-                Powered by Research NXT Analytics Platform
-              </p>
+              <span className="text-xs text-slate-500">Confidential 2025</span>
             </div>
           </div>
         </div>
-
-        {/* Export Loading Overlay */}
-        {isExporting && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 flex items-center gap-3">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-              <span className="text-slate-900 font-medium">Generating export...</span>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
 }
 
-// Business View Component with fullscreen support
-function BusinessView({ isFullscreen, data }: { isFullscreen: boolean; data?: any }) {
+function BusinessView({ data }: { data?: any }) {
   const getBusinessData = () => {
     if (data?.business && data.business.length > 0) {
       const businessData = data.business[0]
@@ -391,10 +215,10 @@ function BusinessView({ isFullscreen, data }: { isFullscreen: boolean; data?: an
   const companyData = getBusinessData()
 
   return (
-    <div className={`p-4 sm:p-6 ${isFullscreen ? "h-full" : ""}`}>
-      <div className={`${isFullscreen ? "h-full flex flex-col gap-4" : "space-y-6"}`}>
+    <div className="p-4 sm:p-6">
+      <div className="space-y-6">
         {/* Main Content Grid */}
-        <div className={`grid lg:grid-cols-4 gap-4 ${isFullscreen ? "flex-shrink-0" : "gap-6"}`}>
+        <div className="grid lg:grid-cols-4 gap-6">
           {/* Company Information Cards - Takes 3 columns */}
           <div className="lg:col-span-3">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -484,17 +308,6 @@ function BusinessView({ isFullscreen, data }: { isFullscreen: boolean; data?: an
                 </CardContent>
               </Card>
 
-              {/* About Section - Moved here in fullscreen */}
-              {isFullscreen && (
-                <Card className="border-slate-200 sm:col-span-2">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base font-semibold text-slate-900">About the Company</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-slate-700 leading-relaxed">{companyData.about}</p>
-                  </CardContent>
-                </Card>
-              )}
             </div>
           </div>
 
@@ -526,17 +339,14 @@ function BusinessView({ isFullscreen, data }: { isFullscreen: boolean; data?: an
           </div>
         </div>
 
-        {/* About Section - Only show in normal mode */}
-        {!isFullscreen && (
-          <Card className="border-slate-200">
-            <CardHeader>
-              <CardTitle className="text-base font-semibold text-slate-900">About the Company</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-slate-700 leading-relaxed">{companyData.about}</p>
-            </CardContent>
-          </Card>
-        )}
+        <Card className="border-slate-200">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold text-slate-900">About the Company</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-slate-700 leading-relaxed">{companyData.about}</p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
