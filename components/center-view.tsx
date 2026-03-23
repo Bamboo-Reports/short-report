@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Building2, Users, Phone, MapPin, Globe, Cpu, Eye, ArrowLeft } from "lucide-react"
+import { Building2, Users, Phone, MapPin, Globe, Cpu, Eye, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react"
 import type { CenterInfo } from "@/types/dashboard"
 
 interface CenterViewProps {
@@ -20,13 +20,17 @@ interface CenterViewProps {
 }
 
 export function CenterView({ centers }: CenterViewProps) {
-  const [selectedCenter, setSelectedCenter] = useState<CenterInfo | null>(null)
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
-  if (selectedCenter) {
+  if (selectedIndex !== null) {
     return (
       <CenterDetailView
-        center={selectedCenter}
-        onBack={() => setSelectedCenter(null)}
+        center={centers[selectedIndex]}
+        currentIndex={selectedIndex}
+        total={centers.length}
+        onBack={() => setSelectedIndex(null)}
+        onPrev={() => setSelectedIndex(selectedIndex - 1)}
+        onNext={() => setSelectedIndex(selectedIndex + 1)}
       />
     )
   }
@@ -125,7 +129,7 @@ export function CenterView({ centers }: CenterViewProps) {
                       variant="ghost"
                       size="sm"
                       className="h-8 w-8 p-0 text-muted-foreground hover:text-brand-blue hover:bg-brand-blue/10"
-                      onClick={() => setSelectedCenter(center)}
+                      onClick={() => setSelectedIndex(index)}
                       aria-label={`View details for ${center.location} center`}
                     >
                       <Eye className="w-4 h-4" />
@@ -143,15 +147,23 @@ export function CenterView({ centers }: CenterViewProps) {
 
 function CenterDetailView({
   center,
+  currentIndex,
+  total,
   onBack,
+  onPrev,
+  onNext,
 }: {
   center: CenterInfo
+  currentIndex: number
+  total: number
   onBack: () => void
+  onPrev: () => void
+  onNext: () => void
 }) {
   return (
     <div className="px-6 sm:px-8 py-6 space-y-6">
-      {/* Back Button + Header */}
-      <div className="flex items-center gap-4">
+      {/* Back Button + Navigation */}
+      <div className="flex items-center justify-between">
         <Button
           variant="ghost"
           size="sm"
@@ -162,6 +174,33 @@ function CenterDetailView({
           <ArrowLeft className="w-4 h-4 mr-1.5" />
           All Centers
         </Button>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground tabular-nums">
+            {currentIndex + 1} of {total}
+          </span>
+          <div className="flex items-center gap-0.5">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={onPrev}
+              disabled={currentIndex === 0}
+              aria-label="Previous center"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={onNext}
+              disabled={currentIndex === total - 1}
+              aria-label="Next center"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Center Header Card */}

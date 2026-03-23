@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Mail, Linkedin, MapPin, User, ExternalLink, Eye, ArrowLeft, Briefcase, GraduationCap, UserCheck } from "lucide-react"
+import { Mail, Linkedin, MapPin, User, ExternalLink, Eye, ArrowLeft, ChevronLeft, ChevronRight, Briefcase, GraduationCap, UserCheck } from "lucide-react"
 import type { ContactInfo } from "@/types/dashboard"
 
 interface ContactViewProps {
@@ -20,13 +20,17 @@ interface ContactViewProps {
 }
 
 export function ContactView({ contacts }: ContactViewProps) {
-  const [selectedContact, setSelectedContact] = useState<ContactInfo | null>(null)
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
-  if (selectedContact) {
+  if (selectedIndex !== null) {
     return (
       <ContactDetailView
-        contact={selectedContact}
-        onBack={() => setSelectedContact(null)}
+        contact={contacts[selectedIndex]}
+        currentIndex={selectedIndex}
+        total={contacts.length}
+        onBack={() => setSelectedIndex(null)}
+        onPrev={() => setSelectedIndex(selectedIndex - 1)}
+        onNext={() => setSelectedIndex(selectedIndex + 1)}
       />
     )
   }
@@ -118,7 +122,7 @@ export function ContactView({ contacts }: ContactViewProps) {
                       variant="ghost"
                       size="sm"
                       className="h-8 w-8 p-0 text-muted-foreground hover:text-brand-blue hover:bg-brand-blue/10"
-                      onClick={() => setSelectedContact(contact)}
+                      onClick={() => setSelectedIndex(index)}
                       aria-label={`View profile for ${contact.firstName} ${contact.lastName}`}
                     >
                       <Eye className="w-4 h-4" />
@@ -136,15 +140,23 @@ export function ContactView({ contacts }: ContactViewProps) {
 
 function ContactDetailView({
   contact,
+  currentIndex,
+  total,
   onBack,
+  onPrev,
+  onNext,
 }: {
   contact: ContactInfo
+  currentIndex: number
+  total: number
   onBack: () => void
+  onPrev: () => void
+  onNext: () => void
 }) {
   return (
     <div className="px-6 sm:px-8 py-6 space-y-6">
-      {/* Back Button */}
-      <div className="flex items-center gap-4">
+      {/* Back Button + Navigation */}
+      <div className="flex items-center justify-between">
         <Button
           variant="ghost"
           size="sm"
@@ -155,6 +167,33 @@ function ContactDetailView({
           <ArrowLeft className="w-4 h-4 mr-1.5" />
           All Contacts
         </Button>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground tabular-nums">
+            {currentIndex + 1} of {total}
+          </span>
+          <div className="flex items-center gap-0.5">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={onPrev}
+              disabled={currentIndex === 0}
+              aria-label="Previous contact"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={onNext}
+              disabled={currentIndex === total - 1}
+              aria-label="Next contact"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Profile Header with Contact Info */}
