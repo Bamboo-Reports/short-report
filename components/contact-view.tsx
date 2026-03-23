@@ -1,95 +1,17 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Mail, Linkedin, MapPin, User, ExternalLink } from "lucide-react"
+import type { ContactInfo } from "@/types/dashboard"
 
-export function ContactView({ data }: { data?: any }) {
-  const getContactData = () => {
-    if (data?.contact && data.contact.length > 0) {
-      return data.contact.map((contact: any) => ({
-        accountName: contact.accountName || "Account Name",
-        entityName: contact.entityName || "Entity Name",
-        firstName: contact.firstName || "First",
-        lastName: contact.lastName || "Last",
-        designation: contact.designation || "Position",
-        email: contact.email || "email@example.com",
-        city: contact.city || "City",
-        state: contact.state || "State",
-        country: contact.country || "Country",
-        linkedin: contact.linkedin || "",
-      }))
-    }
+interface ContactViewProps {
+  contacts: ContactInfo[]
+}
 
-    // Default data
-    return [
-      {
-        accountName: "Zscaler Inc.",
-        entityName: "Zscaler Softech India Pvt. Ltd.",
-        firstName: "Vishal",
-        lastName: "Gautam",
-        designation: "Vice President, Engineering & Site Managing Director",
-        email: "vgautam@zscaler.com",
-        city: "Bengaluru",
-        state: "Karnataka",
-        country: "India",
-        linkedin: "linkedin.com/in/gautamvishal",
-      },
-      {
-        accountName: "Zscaler Inc.",
-        entityName: "Zscaler Softech India Pvt. Ltd.",
-        firstName: "Kirabkumar",
-        lastName: "D G",
-        designation: "Director of Engineering",
-        email: "kirankumardg@zscaler.com",
-        city: "Bengaluru",
-        state: "Karnataka",
-        country: "India",
-        linkedin: "linkedin.com/in/kirankumardg",
-      },
-      {
-        accountName: "Zscaler Inc.",
-        entityName: "Zscaler Softech India Pvt. Ltd.",
-        firstName: "Saurav",
-        lastName: "G",
-        designation: "Director of Engineering",
-        email: "sauravg@zscaler.com",
-        city: "Bengaluru",
-        state: "Karnataka",
-        country: "India",
-        linkedin: "linkedin.com/in/sauravmware",
-      },
-      {
-        accountName: "Zscaler Inc.",
-        entityName: "Zscaler Softech India Pvt. Ltd.",
-        firstName: "Kishore",
-        lastName: "Thakur",
-        designation: "Senior Director, Site Reliability Engineering",
-        email: "kthakur@zscaler.com",
-        city: "Hyderabad",
-        state: "Telangana",
-        country: "India",
-        linkedin: "linkedin.com/in/kishorethakur",
-      },
-      {
-        accountName: "Zscaler Inc.",
-        entityName: "Zscaler Softech India Pvt. Ltd.",
-        firstName: "Satish",
-        lastName: "Sreenivasaiah",
-        designation: "Director - Product Security Engineering",
-        email: "satishsreenivasaiah@zscaler.com",
-        city: "Bengaluru",
-        state: "Karnataka",
-        country: "India",
-        linkedin: "linkedin.com/in/satish-sreenivasaiah-b661983/",
-      },
-    ]
-  }
-
-  const contactData = getContactData()
-
+export function ContactView({ contacts }: ContactViewProps) {
   return (
     <div className="p-4 sm:p-6">
       <div className="space-y-4">
-        {contactData.map((contact, index) => (
+        {contacts.map((contact, index) => (
           <Card key={index} className="border-slate-200 hover:shadow-md transition-shadow">
             <CardContent className="p-6">
               <div className="grid lg:grid-cols-4 gap-6">
@@ -106,7 +28,6 @@ export function ContactView({ data }: { data?: any }) {
                       <p className="text-xs text-slate-500">{contact.entityName}</p>
                     </div>
                   </div>
-
                   <div className="space-y-2">
                     <div>
                       <p className="text-xs text-slate-500">Account</p>
