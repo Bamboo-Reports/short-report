@@ -3,8 +3,12 @@ import type {
   BusinessInfo,
   CenterInfo,
   ContactInfo,
+  DealInfo,
+  TechStackInfo,
+  GccSnapshotInfo,
+  OpportunityInfo,
 } from "@/types/dashboard"
-import { DEFAULT_BUSINESS, DEFAULT_CENTERS, DEFAULT_CONTACTS } from "./default-data"
+import { DEFAULT_BUSINESS, DEFAULT_CENTERS, DEFAULT_CONTACTS, DEFAULT_DEALS, DEFAULT_TECH_STACK, DEFAULT_GCC_SNAPSHOT, DEFAULT_OPPORTUNITIES } from "./default-data"
 
 export function getBusinessInfo(data?: DashboardData): BusinessInfo {
   if (!data?.business || data.business.length === 0) {
@@ -89,6 +93,89 @@ export function getContactInfo(data?: DashboardData): ContactInfo[] {
     career: parseBulletString(c.career),
     currentProfile: parseBulletString(c.currentProfile),
     qualifications: parseBulletString(c.qualification),
+  }))
+}
+
+export function getDealInfo(data?: DashboardData): DealInfo[] {
+  if (!data?.deal || data.deal.length === 0) {
+    return DEFAULT_DEALS
+  }
+
+  return data.deal.map((d) => ({
+    solutionType: d.solutionType || "",
+    dealType: d.dealType || "",
+    dealYear: d.dealYear || "",
+    dealYearEnd: d.dealYearEnd || "",
+    country: d.country || "",
+    companyEntity: d.companyEntity || "",
+    partnerName: d.partnerName || "",
+    partnerUrl: d.partnerUrl || "",
+    solution: parseBulletString(d.solution),
+    dealDetails: parseBulletString(d.dealDetails),
+    companyKeyPersons: parseBulletString(d.companyKeyPerson),
+    partnerKeyPersons: parseBulletString(d.partnerKeyPerson),
+    url: d.url || "",
+  }))
+}
+
+export function getTechStackInfo(data?: DashboardData): TechStackInfo[] {
+  if (!data?.techStack || data.techStack.length === 0) {
+    return DEFAULT_TECH_STACK
+  }
+
+  return data.techStack.map((t) => ({
+    company: t.company || "",
+    tool: t.tool || "",
+    category: t.category || "",
+    count: parseInt(t.count || "1", 10) || 1,
+  }))
+}
+
+export function getGccSnapshot(centers: CenterInfo[], contacts: ContactInfo[]): GccSnapshotInfo {
+  if (centers.length === 0 && contacts.length === 0) {
+    return DEFAULT_GCC_SNAPSHOT
+  }
+
+  const currentHeadcount = centers.reduce((sum, c) => sum + (parseInt(c.employeeCount, 10) || 0), 0)
+
+  const defaultCenter = (city: string) => DEFAULT_GCC_SNAPSHOT.centers.find((dc) => dc.city === city)
+
+  const centerSnapshots = centers.map((c) => {
+    const dc = defaultCenter(c.location)
+    return {
+      city: c.location,
+      centerName: c.legalName,
+      centerType: c.centerType,
+      incYear: c.incYear,
+      employeeCount: c.employeeCount,
+      analystNote: dc?.analystNote
+        || `Supports ${c.accountName}'s operations with focus on ${Object.keys(c.services).join(", ").toLowerCase()}.`,
+      lat: dc?.lat || 20.5937,
+      lng: dc?.lng || 78.9629,
+    }
+  })
+
+  const keyExecutives = contacts.slice(0, 4).map((c) => ({
+    name: `${c.firstName} ${c.lastName}`,
+    designation: c.designation,
+  }))
+
+  return {
+    centers: centerSnapshots,
+    keyExecutives,
+    currentHeadcount,
+    headcountHistory: DEFAULT_GCC_SNAPSHOT.headcountHistory,
+  }
+}
+
+export function getOpportunities(data?: DashboardData): OpportunityInfo[] {
+  if (!data?.opportunity || data.opportunity.length === 0) {
+    return DEFAULT_OPPORTUNITIES
+  }
+
+  return data.opportunity.map((o) => ({
+    opportunity: o.opportunity || "",
+    details: parseBulletString(o.opportunityDetails),
   }))
 }
 

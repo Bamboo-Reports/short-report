@@ -10,21 +10,33 @@ import {
   Building2,
   Users,
   Shield,
+  Handshake,
+  Cpu,
+  MapPin,
+  Lightbulb,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react"
 import { BusinessView } from "@/components/business-view"
 import { CenterView } from "@/components/center-view"
 import { ContactView } from "@/components/contact-view"
-import { getBusinessInfo, getCenterInfo, getContactInfo } from "@/lib/transform-data"
+import { DealView } from "@/components/deal-view"
+import { TechView } from "@/components/tech-view"
+import { GccView } from "@/components/gcc-view"
+import { OpportunityView } from "@/components/opportunity-view"
+import { getBusinessInfo, getCenterInfo, getContactInfo, getDealInfo, getTechStackInfo, getGccSnapshot, getOpportunities } from "@/lib/transform-data"
 import type { DashboardData } from "@/types/dashboard"
 
-type ViewType = "business" | "center" | "contact"
+type ViewType = "business" | "center" | "contact" | "deal" | "tech" | "gcc" | "opportunity"
 
 const VIEWS = [
   { key: "business" as ViewType, title: "Business Snapshot", subtitle: "Company Overview & Analytics", icon: Shield },
   { key: "center" as ViewType, title: "Center Details", subtitle: "Office Locations & Operations", icon: Building2 },
   { key: "contact" as ViewType, title: "Contact Details", subtitle: "Key Personnel & Leadership", icon: Users },
+  { key: "deal" as ViewType, title: "Deal Details", subtitle: "Partnerships & Customer Deals", icon: Handshake },
+  { key: "tech" as ViewType, title: "Tech Details", subtitle: "Technology Stack & Landscape", icon: Cpu },
+  { key: "gcc" as ViewType, title: "GCC Snapshot", subtitle: "India Centers Overview & Growth", icon: MapPin },
+  { key: "opportunity" as ViewType, title: "Opportunity Map", subtitle: "Strategic Growth Opportunities", icon: Lightbulb },
 ]
 
 const SOCIAL_ICONS = [
@@ -40,6 +52,10 @@ export default function BusinessDashboard({ data }: { data?: DashboardData }) {
   const businessInfo = useMemo(() => getBusinessInfo(data), [data])
   const centerInfo = useMemo(() => getCenterInfo(data), [data])
   const contactInfo = useMemo(() => getContactInfo(data), [data])
+  const dealInfo = useMemo(() => getDealInfo(data), [data])
+  const techStackInfo = useMemo(() => getTechStackInfo(data), [data])
+  const gccSnapshot = useMemo(() => getGccSnapshot(centerInfo, contactInfo), [centerInfo, contactInfo])
+  const opportunityInfo = useMemo(() => getOpportunities(data), [data])
 
   const currentViewIndex = VIEWS.findIndex((view) => view.key === currentView)
   const CurrentIcon = VIEWS[currentViewIndex].icon
@@ -150,6 +166,10 @@ export default function BusinessDashboard({ data }: { data?: DashboardData }) {
           {currentView === "business" && <BusinessView businessInfo={businessInfo} />}
           {currentView === "center" && <CenterView centers={centerInfo} />}
           {currentView === "contact" && <ContactView contacts={contactInfo} />}
+          {currentView === "deal" && <DealView deals={dealInfo} />}
+          {currentView === "tech" && <TechView techStack={techStackInfo} />}
+          {currentView === "gcc" && <GccView snapshot={gccSnapshot} />}
+          {currentView === "opportunity" && <OpportunityView opportunities={opportunityInfo} />}
         </div>
 
         {/* Footer */}

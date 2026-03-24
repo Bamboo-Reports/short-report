@@ -1,4 +1,4 @@
-import type { BusinessInfo, CenterInfo, ContactInfo } from "@/types/dashboard"
+import type { BusinessInfo, CenterInfo, ContactInfo, DealInfo, TechStackInfo, GccSnapshotInfo, OpportunityInfo } from "@/types/dashboard"
 
 export const DEFAULT_BUSINESS: BusinessInfo = {
   name: "Zscaler Inc.",
@@ -222,6 +222,329 @@ export const DEFAULT_CONTACTS: ContactInfo[] = [
       "M.S. in Information Security from Carnegie Mellon University (2011-2013)",
       "B.E. in Computer Science from BMS College of Engineering, Bengaluru (2005-2009)",
       "CISSP, OSCP, CEH Certified",
+    ],
+  },
+]
+
+export const DEFAULT_DEALS: DealInfo[] = [
+  {
+    solutionType: "Cloud",
+    dealType: "Partnership",
+    dealYear: "2024",
+    dealYearEnd: "",
+    country: "United States",
+    companyEntity: "Zscaler Inc.",
+    partnerName: "nCino, Inc.",
+    partnerUrl: "ncino.com",
+    solution: ["Allegro"],
+    dealDetails: [
+      "nCino purchased Allegro from TruStage.",
+      "Allegro is a powerful lending software that enables lenders the flexibility to help manage, process data and respond to customer inquiries more efficiently.",
+    ],
+    companyKeyPersons: [],
+    partnerKeyPersons: [
+      "Law Helie — General Manager of Consumer Lending, nCino, Inc.",
+    ],
+    url: "https://bit.ly/4at93kd",
+  },
+  {
+    solutionType: "Data and Analytics",
+    dealType: "Outsourced Deal",
+    dealYear: "2024",
+    dealYearEnd: "",
+    country: "United States",
+    companyEntity: "Zscaler Inc.",
+    partnerName: "Lucky Orange LLC",
+    partnerUrl: "luckyorange.com",
+    solution: ["Lucky Orange"],
+    dealDetails: [
+      "TruStage has purchased software from Lucky Orange for Marketing Analytics",
+    ],
+    companyKeyPersons: [],
+    partnerKeyPersons: [],
+    url: "https://bit.ly/4bqgDgY",
+  },
+  {
+    solutionType: "Digital Transformation",
+    dealType: "Customer Deals",
+    dealYear: "2024",
+    dealYearEnd: "",
+    country: "United States",
+    companyEntity: "Zscaler Inc.",
+    partnerName: "Community Resource Credit Union",
+    partnerUrl: "crcu.org",
+    solution: ["LPL Financial Institution Services Platform"],
+    dealDetails: [
+      "LPL and TruStage partners to serve the growing CRCU Retirement and Investment Services program and capabilities.",
+      "CRCU Retirement and Investment Services will onboard to the LPL Financial Institution Services platform.",
+    ],
+    companyKeyPersons: [],
+    partnerKeyPersons: [
+      "Tim Foley — Chief Operations Officer, Community Resource Credit Union",
+    ],
+    url: "https://bit.ly/4ayxzR3",
+  },
+  {
+    solutionType: "Digital Transformation",
+    dealType: "Customer Deals",
+    dealYear: "2024",
+    dealYearEnd: "",
+    country: "United States",
+    companyEntity: "Zscaler Inc.",
+    partnerName: "Beem",
+    partnerUrl: "beem.com",
+    solution: ["TruStage Payment Guard"],
+    dealDetails: [
+      "The collaboration with TruStage underscores Beem's commitment to enhancing its members' financial well-being. TruStage Payment Guard, now integrated into Beem's offerings.",
+    ],
+    companyKeyPersons: [
+      "Danielle Sesko — Director of Product Management, TruStage Financial Group, Inc.",
+    ],
+    partnerKeyPersons: ["Akshay K — CEO, Beem"],
+    url: "https://bit.ly/4bFGa5C",
+  },
+  {
+    solutionType: "Digital Transformation",
+    dealType: "Customer Deals",
+    dealYear: "2024",
+    dealYearEnd: "",
+    country: "United States",
+    companyEntity: "Zscaler Inc.",
+    partnerName: "QCash Financial, LLC",
+    partnerUrl: "qcashfinancial.com",
+    solution: ["Payment Guard Insurance"],
+    dealDetails: [
+      "QCash Financial Partners With TruStage for Payment Guard Insurance.",
+    ],
+    companyKeyPersons: [
+      "Danielle Sesko — Director of Product Management, TruStage Financial Group, Inc.",
+    ],
+    partnerKeyPersons: ["Seth Brickman — CEO, QCash Financial, LLC"],
+    url: "https://bit.ly/4dQ07IA",
+  },
+  {
+    solutionType: "Digital Transformation",
+    dealType: "In-House Deal",
+    dealYear: "2024",
+    dealYearEnd: "",
+    country: "United States",
+    companyEntity: "Zscaler Inc.",
+    partnerName: "TruStage Financial Group, Inc.",
+    partnerUrl: "trustage.com",
+    solution: ["TruStage GAP"],
+    dealDetails: [
+      "TruStage™ makes GAP coverage available through the Digital Storefront Software as a Service (SaaS) solution.",
+      "Digital Storefront allows credit unions to efficiently market financial and insurance products, boosting member engagement and increasing various income streams.",
+    ],
+    companyKeyPersons: [
+      "Brian Bodell — Vice President of Technology, TruStage Financial Group, Inc.",
+    ],
+    partnerKeyPersons: [],
+    url: "https://bit.ly/4dPs7Mm",
+  },
+  {
+    solutionType: "Workflow Automation",
+    dealType: "Customer Deals",
+    dealYear: "2024",
+    dealYearEnd: "",
+    country: "United States",
+    companyEntity: "Zscaler Inc.",
+    partnerName: "Union Bank of Vermont",
+    partnerUrl: "ublocal.com",
+    solution: ["TruStage™ Compliance Doc Prep"],
+    dealDetails: [
+      "Union Bank leverage Baker Hill NextGen® for consumer lending, along with TruStage™ Compliance Solutions for document preparation.",
+      "Baker Hill NextGen® and TruStage™ Compliance Solutions offer banks an integrated, end-to-end solution that streamlines the entire loan process with increased speed, consistency, and simplified compliance.",
+    ],
+    companyKeyPersons: [],
+    partnerKeyPersons: [
+      "Jonathan Gould — SVP, Union Bank of Vermont",
+    ],
+    url: "https://bit.ly/4aBxDPP",
+  },
+  {
+    solutionType: "Digital Transformation",
+    dealType: "Partnership",
+    dealYear: "2023",
+    dealYearEnd: "",
+    country: "United States",
+    companyEntity: "Zscaler Inc.",
+    partnerName: "Chartway Federal Credit Union",
+    partnerUrl: "chartway.com",
+    solution: ["Digital Deposits Solution"],
+    dealDetails: [
+      "Chartway Credit Union launched a test of the TruStage Digital Deposit solution with a small segment of its membership.",
+    ],
+    companyKeyPersons: [],
+    partnerKeyPersons: [
+      "Melissa Cade — Senior Vice President (SVP) of Product and Innovation, Chartway Federal Credit Union",
+    ],
+    url: "https://bit.ly/4dRL3dC",
+  },
+  {
+    solutionType: "Digital Transformation",
+    dealType: "Partnership",
+    dealYear: "2023",
+    dealYearEnd: "",
+    country: "United States",
+    companyEntity: "Zscaler Inc.",
+    partnerName: "Baxter Credit Union",
+    partnerUrl: "bcu.org",
+    solution: [
+      "LPL's Institution Services platform",
+      "Digital Tools",
+    ],
+    dealDetails: [
+      "Collaboration integrates extensive credit union expertise, advanced data, and LPL's digital tools, providing financial professionals serving BCU members with robust resources to enhance consumer financial decision-making.",
+    ],
+    companyKeyPersons: [
+      "Rob Comfort — EX Vice President, TruStage Financial Group, Inc.",
+    ],
+    partnerKeyPersons: [
+      "Mike Valentine — President and CEO, Baxter Credit Union",
+      "Dave Blum — Executive vice president of BCU and chair of the board of managers, BCU Wealth Advisors LLC",
+      "Rich Steinmeier — Managing Director and Divisional President, Business Development, LPL Financial Holdings Inc.",
+    ],
+    url: "https://bit.ly/4dMYoUr",
+  },
+  {
+    solutionType: "Digital Transformation",
+    dealType: "Customer Deals",
+    dealYear: "2023",
+    dealYearEnd: "",
+    country: "United States",
+    companyEntity: "Zscaler Inc.",
+    partnerName: "Zirtue, LLC",
+    partnerUrl: "zirtue.com",
+    solution: ["Payment Guard Insurance"],
+    dealDetails: [
+      "Zirtue announce its deployment of the TruStage Payment Guard product.",
+      "Payment Guard solution enables an innovative solution that could act as a safety net for lenders, underscoring.",
+    ],
+    companyKeyPersons: [
+      "Danielle Sesko — Director of Product Management, TruStage Financial Group, Inc.",
+    ],
+    partnerKeyPersons: [
+      "Dennis Cail — Co-founder and CEO, Zirtue, LLC",
+    ],
+    url: "https://bit.ly/4bN3IVV",
+  },
+  {
+    solutionType: "Digital Transformation",
+    dealType: "In-House Deal",
+    dealYear: "2023",
+    dealYearEnd: "",
+    country: "United States",
+    companyEntity: "Zscaler Inc.",
+    partnerName: "TruStage Financial Group, Inc.",
+    partnerUrl: "trustage.com",
+    solution: ["Digital Deposits Solution"],
+    dealDetails: [
+      "TruStage™ renames CuneXus as Digital Storefront and adds Digital Deposits solution.",
+      "The adaptable Digital Storefront allows financial institutions to customize and present personalized offers and pre-approvals for lending, deposit products, insurance, or financial services to consumers.",
+    ],
+    companyKeyPersons: [],
+    partnerKeyPersons: [],
+    url: "https://bit.ly/4dRL3dC",
+  },
+]
+
+export const DEFAULT_TECH_STACK: TechStackInfo[] = [
+  { company: "Zscaler Inc.", tool: "Cassandra", category: "Database", count: 4 },
+  { company: "Zscaler Inc.", tool: "Dynamo DB", category: "Database", count: 2 },
+  { company: "Zscaler Inc.", tool: "Redis", category: "Database", count: 2 },
+  { company: "Zscaler Inc.", tool: "Snowflake", category: "Database", count: 2 },
+  { company: "Zscaler Inc.", tool: "JIRA", category: "DevOps", count: 2 },
+  { company: "Zscaler Inc.", tool: "Confluence", category: "DevOps", count: 2 },
+  { company: "Zscaler Inc.", tool: "Sentry", category: "DevOps", count: 2 },
+  { company: "Zscaler Inc.", tool: "Datadog", category: "DevOps", count: 2 },
+  { company: "Zscaler Inc.", tool: "Github", category: "DevOps", count: 2 },
+  { company: "Zscaler Inc.", tool: "Circle CI", category: "DevOps", count: 2 },
+  { company: "Zscaler Inc.", tool: "Ruby", category: "Programming", count: 2 },
+  { company: "Zscaler Inc.", tool: "Python", category: "Programming", count: 1 },
+  { company: "Zscaler Inc.", tool: "GO", category: "Programming", count: 2 },
+  { company: "Zscaler Inc.", tool: "Swift", category: "Programming", count: 3 },
+  { company: "Zscaler Inc.", tool: "Scala", category: "Programming", count: 2 },
+  { company: "Zscaler Inc.", tool: "Kotlin", category: "Programming", count: 4 },
+  { company: "Zscaler Inc.", tool: "AWS", category: "Cloud", count: 2 },
+  { company: "Zscaler Inc.", tool: "Cloudflare", category: "Cloud", count: 2 },
+]
+
+export const DEFAULT_GCC_SNAPSHOT: GccSnapshotInfo = {
+  centers: [
+    {
+      city: "Bengaluru",
+      centerName: "Zscaler Softech India Pvt. Ltd.",
+      centerType: "IT",
+      incYear: "2007",
+      employeeCount: "1001",
+      analystNote: "Drives core engineering and cloud security platform development for Zscaler's global Zero Trust Exchange.",
+      lat: 12.9716,
+      lng: 77.5946,
+    },
+    {
+      city: "Hyderabad",
+      centerName: "Zscaler Softech India Pvt. Ltd.",
+      centerType: "IT",
+      incYear: "2024",
+      employeeCount: "113",
+      analystNote: "Newly established center focused on platform engineering, AI/ML, and data center operations to scale Zscaler's infrastructure.",
+      lat: 17.385,
+      lng: 78.4867,
+    },
+  ],
+  keyExecutives: [
+    { name: "Vishal Gautam", designation: "Vice President, Engineering & Site Managing Director" },
+    { name: "Kirabkumar D G", designation: "Director of Engineering" },
+    { name: "Saurav G", designation: "Director of Engineering" },
+    { name: "Kishore Thakur", designation: "Senior Director, Site Reliability Engineering" },
+  ],
+  currentHeadcount: 1114,
+  headcountHistory: [
+    { year: "2023", count: 897 },
+    { year: "2024", count: 1100 },
+    { year: "2025", count: 1114 },
+  ],
+}
+
+export const DEFAULT_OPPORTUNITIES: OpportunityInfo[] = [
+  {
+    opportunity: "AI-Driven Rider Lifecycle Optimization",
+    details: [
+      "Zscaler Inc. is investing in streamlining its logistics and operations, including improvements to rider onboarding and experience.",
+      "Build a complete AI-driven rider lifecycle platform — from intelligent onboarding, performance prediction, and churn analysis to real-time route optimization. This would reduce delivery time, improve operational efficiency, and enhance rider satisfaction.",
+    ],
+  },
+  {
+    opportunity: "Real-Time Personalization Through Advanced Data Analytics",
+    details: [
+      "With a large and diverse user base across multiple countries, Zscaler Inc. can benefit from deeper personalization.",
+      "Implement a real-time analytics system that personalizes content, search results, and promotional offers based on individual user behavior, location, and order history. This enhances customer engagement and increases order frequency.",
+    ],
+  },
+  {
+    opportunity: "Next-Generation Retail Media Monetization Platform",
+    details: [
+      "Zscaler Inc. has begun developing in-app advertising solutions and achieved notable success through its partnership with Criteo.",
+      "Build a scalable in-app advertising solution that allows restaurant and FMCG partners to create, manage, and analyze their ad campaigns. Integrate with programmatic ad partners and deliver precise targeting to boost advertising revenue.",
+    ],
+  },
+  {
+    opportunity: "Unified Merchant Experience Platform",
+    details: [
+      "Create a comprehensive portal for restaurant partners that centralizes onboarding, performance analytics, order management, menu configuration, and integration with POS and inventory systems. This simplifies operations and improves partner satisfaction.",
+    ],
+  },
+  {
+    opportunity: "Cloud-Native Microservices Architecture",
+    details: [
+      "Design and implement a modular, microservices-based backend architecture supported by automated CI/CD pipelines and container orchestration. This ensures scalability, resilience, and faster feature rollout across global markets.",
+    ],
+  },
+  {
+    opportunity: "AI-Based Customer Support System",
+    details: [
+      "Deploy a conversational AI system across multiple channels to automate common customer queries, enable intelligent escalation, and continuously learn from user interactions. This reduces response time and improves customer experience at scale.",
     ],
   },
 ]

@@ -140,8 +140,90 @@ export interface ContactInfo {
   qualifications: string[]
 }
 
+export interface DealData {
+  solutionType?: string
+  dealType?: string
+  dealYear?: string
+  dealYearEnd?: string
+  country?: string
+  companyEntity?: string
+  partnerName?: string
+  partnerUrl?: string
+  solution?: string
+  dealDetails?: string
+  companyKeyPerson?: string
+  partnerKeyPerson?: string
+  url?: string
+}
+
+export interface DealInfo {
+  solutionType: string
+  dealType: string
+  dealYear: string
+  dealYearEnd: string
+  country: string
+  companyEntity: string
+  partnerName: string
+  partnerUrl: string
+  solution: string[]
+  dealDetails: string[]
+  companyKeyPersons: string[]
+  partnerKeyPersons: string[]
+  url: string
+}
+
+export interface TechStackData {
+  company?: string
+  tool?: string
+  category?: string
+  count?: string
+}
+
+export interface TechStackInfo {
+  company: string
+  tool: string
+  category: string
+  count: number
+}
+
+export interface HeadcountYear {
+  year: string
+  count: number
+}
+
+export interface CenterSnapshot {
+  city: string
+  centerName: string
+  centerType: string
+  incYear: string
+  employeeCount: string
+  analystNote: string
+  lat: number
+  lng: number
+}
+
+export interface GccSnapshotInfo {
+  centers: CenterSnapshot[]
+  keyExecutives: { name: string; designation: string }[]
+  currentHeadcount: number
+  headcountHistory: HeadcountYear[]
+}
+
+export interface OpportunityData {
+  opportunity?: string
+  opportunityDetails?: string
+}
+
+export interface OpportunityInfo {
+  opportunity: string
+  details: string[]
+}
+
 export interface DashboardData {
   business?: BusinessData[]
   center?: CenterData[]
   contact?: ContactData[]
+  deal?: DealData[]
+  techStack?: TechStackData[]
+  opportunity?: OpportunityData[]
 }
