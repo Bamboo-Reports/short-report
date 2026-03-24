@@ -71,6 +71,7 @@ export function getCenterInfo(data?: DashboardData): CenterInfo[] {
     address: c.address || "Address not provided",
     phone: c.phone || null,
     accountName: c.accountName || "Account Name",
+    domain: c.domain || "",
   }))
 }
 

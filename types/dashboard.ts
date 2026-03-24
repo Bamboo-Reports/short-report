@@ -92,6 +92,7 @@ export interface CenterData {
   address?: string
   phone?: string | null
   accountName?: string
+  domain?: string
 }
 
 export interface CenterInfo {
@@ -106,6 +107,7 @@ export interface CenterInfo {
   address: string
   phone: string | null
   accountName: string
+  domain: string
 }
 
 export interface ContactData {

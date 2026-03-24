@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Globe,
@@ -31,11 +31,11 @@ type ViewType = "business" | "center" | "contact" | "deal" | "tech" | "gcc" | "o
 
 const VIEWS = [
   { key: "business" as ViewType, title: "Business Snapshot", subtitle: "Company Overview & Analytics", icon: Shield },
+  { key: "gcc" as ViewType, title: "GCC Snapshot", subtitle: "India Centers Overview & Growth", icon: MapPin },
   { key: "center" as ViewType, title: "Center Details", subtitle: "Office Locations & Operations", icon: Building2 },
   { key: "contact" as ViewType, title: "Contact Details", subtitle: "Key Personnel & Leadership", icon: Users },
   { key: "deal" as ViewType, title: "Deal Details", subtitle: "Partnerships & Customer Deals", icon: Handshake },
   { key: "tech" as ViewType, title: "Tech Details", subtitle: "Technology Stack & Landscape", icon: Cpu },
-  { key: "gcc" as ViewType, title: "GCC Snapshot", subtitle: "India Centers Overview & Growth", icon: MapPin },
   { key: "opportunity" as ViewType, title: "Opportunity Map", subtitle: "Strategic Growth Opportunities", icon: Lightbulb },
 ]
 
@@ -46,8 +46,22 @@ const SOCIAL_ICONS = [
   { key: "instagram", icon: Instagram, label: "Instagram" },
 ] as const
 
+const VIEW_KEYS = VIEWS.map((v) => v.key)
+
+function getInitialView(): ViewType {
+  if (typeof window === "undefined") return "business"
+  const param = new URLSearchParams(window.location.search).get("view") as ViewType | null
+  return param && VIEW_KEYS.includes(param) ? param : "business"
+}
+
 export default function BusinessDashboard({ data }: { data?: DashboardData }) {
-  const [currentView, setCurrentView] = useState<ViewType>("business")
+  const [currentView, setCurrentViewState] = useState<ViewType>(getInitialView)
+
+  const setCurrentView = useCallback((view: ViewType) => {
+    setCurrentViewState(view)
+    const url = view === "business" ? window.location.pathname : `${window.location.pathname}?view=${view}`
+    window.history.replaceState(null, "", url)
+  }, [])
 
   const businessInfo = useMemo(() => getBusinessInfo(data), [data])
   const centerInfo = useMemo(() => getCenterInfo(data), [data])

@@ -65,6 +65,7 @@ export const DEFAULT_CENTERS: CenterInfo[] = [
     address: "Bengaluru, Karnataka, India",
     phone: null,
     accountName: "Zscaler Inc.",
+    domain: "zscaler.com",
   },
   {
     legalName: "Zscaler Softech India Pvt. Ltd.",
@@ -88,6 +89,7 @@ export const DEFAULT_CENTERS: CenterInfo[] = [
     address: "Hyderabad, Telangana, India",
     phone: null,
     accountName: "Zscaler Inc.",
+    domain: "zscaler.com",
   },
 ]
 

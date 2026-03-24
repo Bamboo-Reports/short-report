@@ -1,18 +1,25 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Building2, Users, Phone, MapPin, Globe, Cpu, Eye, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react"
+  Building2,
+  Users,
+  Phone,
+  MapPin,
+  Globe,
+  Cpu,
+  Eye,
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Calendar,
+  FileText,
+  Landmark,
+} from "lucide-react"
+import Image from "next/image"
 import type { CenterInfo } from "@/types/dashboard"
 
 interface CenterViewProps {
@@ -21,6 +28,35 @@ interface CenterViewProps {
 
 export function CenterView({ centers }: CenterViewProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
+
+  const analytics = useMemo(() => {
+    const totalHeadcount = centers.reduce(
+      (sum, c) => sum + (parseInt(c.employeeCount.replace(/[^0-9]/g, ""), 10) || 0),
+      0
+    )
+    const uniqueCities = [...new Set(centers.map((c) => c.location))]
+    const uniqueTypes = [...new Set(centers.map((c) => c.centerType))]
+
+    const oldest = centers.reduce((prev, curr) => {
+      const prevYear = parseInt(prev.incYear, 10) || 9999
+      const currYear = parseInt(curr.incYear, 10) || 9999
+      return currYear < prevYear ? curr : prev
+    }, centers[0])
+
+    const largest = centers.reduce((prev, curr) => {
+      const prevCount = parseInt(prev.employeeCount.replace(/[^0-9]/g, ""), 10) || 0
+      const currCount = parseInt(curr.employeeCount.replace(/[^0-9]/g, ""), 10) || 0
+      return currCount > prevCount ? curr : prev
+    }, centers[0])
+
+    const typeCounts: Record<string, number> = {}
+    centers.forEach((c) => {
+      typeCounts[c.centerType] = (typeCounts[c.centerType] || 0) + 1
+    })
+    const dominantType = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A"
+
+    return { totalHeadcount, uniqueCities, uniqueTypes, oldest, largest, dominantType }
+  }, [centers])
 
   if (selectedIndex !== null) {
     return (
@@ -37,110 +73,224 @@ export function CenterView({ centers }: CenterViewProps) {
 
   return (
     <div className="px-6 sm:px-8 py-6">
-      <Card className="border-border/60 shadow-sm">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
-            <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
-              <Building2 className="w-4 h-4 text-brand-blue" />
+      <div className="space-y-6">
+        {/* Summary Metrics Strip */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <MetricCard
+            icon={<Building2 className="w-5 h-5" />}
+            label="Total Centers"
+            value={String(centers.length)}
+            accent="blue"
+          />
+          <MetricCard
+            icon={<Users className="w-5 h-5" />}
+            label="Total Headcount"
+            value={analytics.totalHeadcount.toLocaleString()}
+            accent="orange"
+          />
+          <MetricCard
+            icon={<MapPin className="w-5 h-5" />}
+            label="Locations"
+            value={analytics.uniqueCities.join(", ")}
+            accent="blue"
+          />
+          <MetricCard
+            icon={<Landmark className="w-5 h-5" />}
+            label="Center Types"
+            value={analytics.uniqueTypes.join(", ")}
+            accent="orange"
+          />
+        </div>
+
+        {/* Analyst Narrative */}
+        <Card className="border-border/60 shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
+              <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
+                <FileText className="w-4 h-4 text-brand-orange" />
+              </div>
+              Analyst Overview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-foreground/80 leading-relaxed mb-4">
+              {centers[0]?.accountName} operates{" "}
+              <span className="font-semibold text-foreground">{centers.length} center{centers.length !== 1 ? "s" : ""}</span>{" "}
+              across{" "}
+              <span className="font-semibold text-foreground">{analytics.uniqueCities.length} {analytics.uniqueCities.length === 1 ? "city" : "cities"}</span>{" "}
+              in India, with a combined workforce of{" "}
+              <span className="font-semibold text-foreground">{analytics.totalHeadcount.toLocaleString()} employees</span>.
+              The footprint spans {analytics.uniqueCities.join(", ")}, covering {analytics.uniqueTypes.join(" and ")} operations.
+            </p>
+            <div className="space-y-2.5">
+              <div className="flex items-start gap-2.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-brand-blue flex-shrink-0 mt-[7px]" />
+                <p className="text-sm text-foreground/80 leading-relaxed">
+                  The oldest center was established in{" "}
+                  <span className="font-semibold text-foreground">{analytics.oldest.incYear}</span> in{" "}
+                  <span className="font-semibold text-foreground">{analytics.oldest.location}</span>{" "}
+                  ({analytics.oldest.legalName}), anchoring the company&apos;s long-standing India presence.
+                </p>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-brand-orange flex-shrink-0 mt-[7px]" />
+                <p className="text-sm text-foreground/80 leading-relaxed">
+                  The largest facility by headcount is in{" "}
+                  <span className="font-semibold text-foreground">{analytics.largest.location}</span> with{" "}
+                  <span className="font-semibold text-foreground">{analytics.largest.employeeCount} employees</span>{" "}
+                  ({analytics.largest.legalName}), indicating a primary hub for delivery and operations.
+                </p>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-brand-blue flex-shrink-0 mt-[7px]" />
+                <p className="text-sm text-foreground/80 leading-relaxed">
+                  The dominant center model is{" "}
+                  <span className="font-semibold text-foreground">{analytics.dominantType}</span>, reflecting the
+                  organization&apos;s preference for {analytics.dominantType === "GBS" ? "shared-services consolidation" : "captive technology operations"} in
+                  the India geography.
+                </p>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-brand-orange flex-shrink-0 mt-[7px]" />
+                <p className="text-sm text-foreground/80 leading-relaxed">
+                  Average center size is approximately{" "}
+                  <span className="font-semibold text-foreground">
+                    {Math.round(analytics.totalHeadcount / centers.length).toLocaleString()} employees
+                  </span>
+                  , suggesting {analytics.totalHeadcount / centers.length > 500 ? "large-scale, mature operations" : "lean, focused teams"} across
+                  the portfolio.
+                </p>
+              </div>
             </div>
-            India Centers
-            <Badge variant="outline" className="ml-2 text-xs border-border/60 text-muted-foreground font-normal">
-              {centers.length} {centers.length === 1 ? "center" : "centers"}
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/30 hover:bg-muted/30">
-                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground pl-6">
-                  Legal Name
-                </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Location
-                </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Type
-                </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Est.
-                </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground text-right">
-                  Employees
-                </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Focus Regions
-                </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground text-center pr-6">
-                  Details
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {centers.map((center, index) => (
-                <TableRow
-                  key={index}
-                  className="group hover:bg-muted/20 transition-colors"
-                >
-                  <TableCell className="pl-6 py-4">
-                    <p className="text-sm font-medium text-foreground">{center.legalName}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{center.accountName}</p>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-brand-orange flex-shrink-0" />
-                      <span className="text-sm font-medium text-foreground">{center.location}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      className={`text-xs font-medium border-0 ${
-                        center.centerType === "GBS"
-                          ? "bg-brand-orange/10 text-brand-orange"
-                          : "bg-brand-blue/10 text-brand-blue"
-                      }`}
-                    >
-                      {center.centerType}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm font-medium tabular-nums text-foreground">{center.incYear}</span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className="text-sm font-medium tabular-nums text-foreground">
-                      {center.employeeCount}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {center.focusRegions.map((region, idx) => (
+          </CardContent>
+        </Card>
+
+        {/* Center Cards Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {centers.map((center, index) => (
+            <Card
+              key={index}
+              className="border-border/60 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer group"
+              onClick={() => setSelectedIndex(index)}
+            >
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    {center.domain ? (
+                      <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+                        <Image
+                          src={`https://img.logo.dev/${center.domain}?token=${process.env.NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY}`}
+                          alt={`${center.accountName} logo`}
+                          width={40}
+                          height={40}
+                          className="object-contain w-full h-full"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-xl bg-brand-blue/10 flex items-center justify-center flex-shrink-0">
+                        <Building2 className="w-5 h-5 text-brand-blue" />
+                      </div>
+                    )}
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-base font-semibold text-foreground leading-tight">
+                          {center.location}
+                        </CardTitle>
                         <Badge
-                          key={idx}
-                          variant="outline"
-                          className="text-[11px] px-2 py-0.5 border-brand-blue-light/40 text-brand-blue bg-brand-blue/5"
+                          className={`text-[11px] font-medium border-0 ${
+                            center.centerType === "GBS"
+                              ? "bg-brand-orange/10 text-brand-orange"
+                              : "bg-brand-blue/10 text-brand-blue"
+                          }`}
                         >
-                          {region}
+                          {center.centerType}
                         </Badge>
-                      ))}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-0.5">{center.legalName}</p>
                     </div>
-                  </TableCell>
-                  <TableCell className="text-center pr-6">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 text-muted-foreground hover:text-brand-blue hover:bg-brand-blue/10"
-                      onClick={() => setSelectedIndex(index)}
-                      aria-label={`View details for ${center.location} center`}
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="rounded-lg bg-muted/40 border border-border/40 p-3">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                        Established
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-foreground tabular-nums">{center.incYear}</p>
+                  </div>
+                  <div className="rounded-lg bg-muted/40 border border-border/40 p-3">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <Users className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                        Employees
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-foreground tabular-nums">{center.employeeCount}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap gap-1">
+                    {center.focusRegions.map((region, idx) => (
+                      <Badge
+                        key={idx}
+                        variant="outline"
+                        className="text-[11px] px-2 py-0.5 border-brand-blue-light/40 text-brand-blue bg-brand-blue/5"
+                      >
+                        {region}
+                      </Badge>
+                    ))}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-3 text-xs text-muted-foreground hover:text-brand-blue hover:bg-brand-blue/10 flex-shrink-0"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setSelectedIndex(index)
+                    }}
+                    aria-label={`View details for ${center.location} center`}
+                  >
+                    <Eye className="w-3.5 h-3.5 mr-1.5" />
+                    View Details
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function MetricCard({
+  icon,
+  label,
+  value,
+  accent,
+}: {
+  icon: React.ReactNode
+  label: string
+  value: string
+  accent: "blue" | "orange"
+}) {
+  return (
+    <div className="bg-card rounded-xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+      <div className="flex items-center gap-3 mb-3">
+        <div
+          className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+            accent === "blue" ? "bg-brand-blue/10 text-brand-blue" : "bg-brand-orange/10 text-brand-orange"
+          }`}
+        >
+          {icon}
+        </div>
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
+      </div>
+      <p className="text-lg text-foreground tracking-tight">{value}</p>
     </div>
   )
 }
@@ -227,8 +377,6 @@ function CenterDetailView({
         <FactCard label="Established" value={center.incYear} />
         <FactCard label="Employees" value={center.employeeCount} />
       </div>
-
-
 
       {/* Services */}
       <Card className="border-border/60 shadow-sm">
