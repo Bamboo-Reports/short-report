@@ -11,7 +11,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts"
 import type { GccSnapshotInfo } from "@/types/dashboard"
 
 interface GccViewProps {
@@ -245,7 +245,7 @@ export function GccView({ snapshot }: GccViewProps) {
             >
               <AreaChart
                 data={snapshot.headcountHistory}
-                margin={{ top: 8, right: 12, left: 12, bottom: 0 }}
+                margin={{ top: 24, right: 12, left: 12, bottom: 0 }}
               >
                 <defs>
                   <linearGradient id="headcountGradient" x1="0" y1="0" x2="0" y2="1">
@@ -285,7 +285,15 @@ export function GccView({ snapshot }: GccViewProps) {
                   fill="url(#headcountGradient)"
                   dot={{ r: 4, fill: "#017ABF", strokeWidth: 2, stroke: "white" }}
                   activeDot={{ r: 6, fill: "#F17C1D", strokeWidth: 2, stroke: "white" }}
-                />
+                >
+                  <LabelList
+                    dataKey="count"
+                    position="top"
+                    formatter={(value: number) => value.toLocaleString()}
+                    style={{ fontSize: 11, fontWeight: 600, fill: "#017ABF" }}
+                    offset={10}
+                  />
+                </Area>
               </AreaChart>
             </ChartContainer>
           </CardContent>

@@ -16,6 +16,7 @@ import {
   Lightbulb,
   ChevronLeft,
   ChevronRight,
+  DollarSign,
 } from "lucide-react"
 import { BusinessView } from "@/components/business-view"
 import { CenterView } from "@/components/center-view"
@@ -24,13 +25,15 @@ import { DealView } from "@/components/deal-view"
 import { TechView } from "@/components/tech-view"
 import { GccView } from "@/components/gcc-view"
 import { OpportunityView } from "@/components/opportunity-view"
+import { KeyFinancialsView } from "@/components/key-financials-view"
 import { getBusinessInfo, getCenterInfo, getContactInfo, getDealInfo, getTechStackInfo, getGccSnapshot, getOpportunities } from "@/lib/transform-data"
 import type { DashboardData } from "@/types/dashboard"
 
-type ViewType = "business" | "center" | "contact" | "deal" | "tech" | "gcc" | "opportunity"
+type ViewType = "business" | "financials" | "center" | "contact" | "deal" | "tech" | "gcc" | "opportunity"
 
 const VIEWS = [
   { key: "business" as ViewType, title: "Business Snapshot", subtitle: "Company Overview & Analytics", icon: Shield },
+  { key: "financials" as ViewType, title: "Key Financials", subtitle: "Revenue & Income Analysis", icon: DollarSign },
   { key: "gcc" as ViewType, title: "GCC Snapshot", subtitle: "India Centers Overview & Growth", icon: MapPin },
   { key: "center" as ViewType, title: "Center Details", subtitle: "Office Locations & Operations", icon: Building2 },
   { key: "contact" as ViewType, title: "Contact Details", subtitle: "Key Personnel & Leadership", icon: Users },
@@ -178,6 +181,7 @@ export default function BusinessDashboard({ data }: { data?: DashboardData }) {
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-[1400px] mx-auto">
           {currentView === "business" && <BusinessView businessInfo={businessInfo} />}
+          {currentView === "financials" && <KeyFinancialsView />}
           {currentView === "center" && <CenterView centers={centerInfo} />}
           {currentView === "contact" && <ContactView contacts={contactInfo} />}
           {currentView === "deal" && <DealView deals={dealInfo} />}

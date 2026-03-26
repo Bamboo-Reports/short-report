@@ -10,7 +10,11 @@
       "Bash(\"C:\\\\Users\\\\avisek-rnxt\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe\" .agents/skills/ui-ux-pro-max/scripts/search.py \"executive dashboard business intelligence corporate enterprise\" --design-system -p \"Short Report\")",
       "Bash(npx next:*)",
       "Bash(npm install:*)",
-      "Bash(taskkill //f //im node.exe)"
+      "Bash(taskkill //f //im node.exe)",
+      "Bash(git status:*)",
+      "Bash(git config:*)",
+      "Bash(grep -l \"export function\" components/deal-view-*.tsx)",
+      "Bash(grep -E \"\\\\.tsx$\")"
     ]
   }
 }
