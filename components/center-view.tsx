@@ -20,13 +20,14 @@ import {
   Landmark,
 } from "lucide-react"
 import Image from "next/image"
-import type { CenterInfo } from "@/types/dashboard"
+import type { CenterInfo, AnalystNoteData } from "@/types/dashboard"
 
 interface CenterViewProps {
   centers: CenterInfo[]
+  analystNotes?: AnalystNoteData | null
 }
 
-export function CenterView({ centers }: CenterViewProps) {
+export function CenterView({ centers, analystNotes }: CenterViewProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
   const analytics = useMemo(() => {
@@ -103,67 +104,32 @@ export function CenterView({ centers }: CenterViewProps) {
         </div>
 
         {/* Analyst Narrative */}
-        <Card className="border-border/60 shadow-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
-              <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
-                <FileText className="w-4 h-4 text-brand-orange" />
+        {analystNotes && analystNotes.notes.length > 0 && (
+          <Card className="border-border/60 shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
+                <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-brand-orange" />
+                </div>
+                Analyst Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2.5">
+                {analystNotes.notes.map((note, idx) => (
+                  <div key={idx} className="flex items-start gap-2.5">
+                    <div
+                      className={`w-1.5 h-1.5 rounded-full mt-[7px] flex-shrink-0 ${
+                        idx % 2 === 0 ? "bg-brand-blue" : "bg-brand-orange"
+                      }`}
+                    />
+                    <p className="text-sm text-foreground/80 leading-relaxed">{note}</p>
+                  </div>
+                ))}
               </div>
-              Analyst Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-foreground/80 leading-relaxed mb-4">
-              {centers[0]?.accountName} operates{" "}
-              <span className="font-semibold text-foreground">{centers.length} center{centers.length !== 1 ? "s" : ""}</span>{" "}
-              across{" "}
-              <span className="font-semibold text-foreground">{analytics.uniqueCities.length} {analytics.uniqueCities.length === 1 ? "city" : "cities"}</span>{" "}
-              in India, with a combined workforce of{" "}
-              <span className="font-semibold text-foreground">{analytics.totalHeadcount.toLocaleString()} employees</span>.
-              The footprint spans {analytics.uniqueCities.join(", ")}, covering {analytics.uniqueTypes.join(" and ")} operations.
-            </p>
-            <div className="space-y-2.5">
-              <div className="flex items-start gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand-blue flex-shrink-0 mt-[7px]" />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  The oldest center was established in{" "}
-                  <span className="font-semibold text-foreground">{analytics.oldest.incYear}</span> in{" "}
-                  <span className="font-semibold text-foreground">{analytics.oldest.location}</span>{" "}
-                  ({analytics.oldest.legalName}), anchoring the company&apos;s long-standing India presence.
-                </p>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand-orange flex-shrink-0 mt-[7px]" />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  The largest facility by headcount is in{" "}
-                  <span className="font-semibold text-foreground">{analytics.largest.location}</span> with{" "}
-                  <span className="font-semibold text-foreground">{analytics.largest.employeeCount} employees</span>{" "}
-                  ({analytics.largest.legalName}), indicating a primary hub for delivery and operations.
-                </p>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand-blue flex-shrink-0 mt-[7px]" />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  The dominant center model is{" "}
-                  <span className="font-semibold text-foreground">{analytics.dominantType}</span>, reflecting the
-                  organization&apos;s preference for {analytics.dominantType === "GBS" ? "shared-services consolidation" : "captive technology operations"} in
-                  the India geography.
-                </p>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand-orange flex-shrink-0 mt-[7px]" />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  Average center size is approximately{" "}
-                  <span className="font-semibold text-foreground">
-                    {Math.round(analytics.totalHeadcount / centers.length).toLocaleString()} employees
-                  </span>
-                  , suggesting {analytics.totalHeadcount / centers.length > 500 ? "large-scale, mature operations" : "lean, focused teams"} across
-                  the portfolio.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Center Cards Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

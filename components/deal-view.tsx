@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/table"
 import { CheckCircle2 } from "lucide-react"
 import { DealMagazine } from "./deal-view-magazine"
-import type { DealInfo } from "@/types/dashboard"
+import type { DealInfo, AnalystNoteData } from "@/types/dashboard"
 
 type DealLayout = "table" | "magazine"
 
@@ -43,6 +43,7 @@ const LAYOUT_OPTIONS: { key: DealLayout; label: string; icon: React.ComponentTyp
 
 interface DealViewProps {
   deals: DealInfo[]
+  analystNotes?: AnalystNoteData | null
 }
 
 interface DealGroup {
@@ -79,117 +80,11 @@ function PartnerLogo({ domain, size = 28 }: { domain: string; size?: number }) {
   )
 }
 
-export function DealView({ deals }: DealViewProps) {
+export function DealView({ deals, analystNotes }: DealViewProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [layout, setLayout] = useState<DealLayout>("table")
 
   const groups = groupBySolutionType(deals)
-
-  const analysis = useMemo(() => {
-    const B = ({ children }: { children: React.ReactNode }) => (
-      <span className="font-semibold text-foreground">{children}</span>
-    )
-
-    // Deal type distribution
-    const dealTypeCounts: Record<string, number> = {}
-    deals.forEach((d) => {
-      dealTypeCounts[d.dealType] = (dealTypeCounts[d.dealType] || 0) + 1
-    })
-    const dominantDealType = Object.entries(dealTypeCounts).sort((a, b) => b[1] - a[1])[0]
-
-    // Solution type distribution
-    const solutionTypeCounts: Record<string, number> = {}
-    deals.forEach((d) => {
-      if (d.solutionType) solutionTypeCounts[d.solutionType] = (solutionTypeCounts[d.solutionType] || 0) + 1
-    })
-    const topSolutionType = Object.entries(solutionTypeCounts).sort((a, b) => b[1] - a[1])[0]
-
-    // Unique partners
-    const uniquePartners = new Set(deals.map((d) => d.partnerName).filter(Boolean))
-
-    // Country spread
-    const countryCounts: Record<string, number> = {}
-    deals.forEach((d) => {
-      if (d.country) countryCounts[d.country] = (countryCounts[d.country] || 0) + 1
-    })
-    const sortedCountries = Object.entries(countryCounts).sort((a, b) => b[1] - a[1])
-
-    // Year range
-    const years = deals.map((d) => parseInt(d.dealYear, 10)).filter((y) => !isNaN(y))
-    const minYear = Math.min(...years)
-    const maxYear = Math.max(...years)
-
-    // Account name
-    const accountName = deals[0]?.companyEntity || "The organization"
-
-    const summary = (
-      <>
-        {accountName} has executed <B>{deals.length} deal{deals.length !== 1 ? "s" : ""}</B> with{" "}
-        <B>{uniquePartners.size} partner{uniquePartners.size !== 1 ? "s" : ""}</B> across{" "}
-        <B>{sortedCountries.length} {sortedCountries.length === 1 ? "country" : "countries"}</B>
-        {years.length > 0 && <>, spanning from <B>{minYear}</B> to <B>{maxYear}</B></>}.
-        {dominantDealType && <>{" "}The dominant engagement model is <B>{dominantDealType[0]}</B>, accounting for{" "}
-          <B>{dominantDealType[1]}</B> of {deals.length} deals.</>}
-      </>
-    )
-
-    const bullets: React.ReactNode[] = []
-
-    // Bullet 1: Solution type focus
-    if (topSolutionType) {
-      bullets.push(
-        <><B>{topSolutionType[0]}</B> is the primary solution focus with <B>{topSolutionType[1]} deal{topSolutionType[1] !== 1 ? "s" : ""}</B>
-          {solutionTypeCounts && Object.keys(solutionTypeCounts).length > 1
-            ? <>, followed by {Object.entries(solutionTypeCounts).sort((a, b) => b[1] - a[1]).slice(1, 3).map(([type, count], i) => (
-                <span key={type}>{i > 0 && " and "}<B>{type}</B> ({count})</span>
-              ))}. This diversification across solution categories reduces vendor concentration risk.</>
-            : ". A single-category focus suggests deep specialization in this domain."}
-        </>
-      )
-    }
-
-    // Bullet 2: Geographic reach
-    if (sortedCountries.length > 0) {
-      const topCountry = sortedCountries[0]
-      const topCountryPct = deals.length > 0 ? Math.round((topCountry[1] / deals.length) * 100) : 0
-      bullets.push(
-        <><B>{topCountryPct}%</B> of deals are concentrated in <B>{topCountry[0]}</B>
-          {sortedCountries.length > 1
-            ? <>, with additional activity in {sortedCountries.slice(1, 4).map(([country], i) => (
-                <span key={country}>{i > 0 && ", "}<B>{country}</B></span>
-              ))}. Cross-border deal activity signals a globally integrated procurement strategy.</>
-            : ". A single-geography focus may present expansion opportunities in other markets."}
-        </>
-      )
-    }
-
-    // Bullet 3: Partner ecosystem
-    if (uniquePartners.size > 0) {
-      bullets.push(
-        <>The partner ecosystem includes <B>{uniquePartners.size} distinct vendor{uniquePartners.size !== 1 ? "s" : ""}</B>.
-          {uniquePartners.size >= deals.length * 0.8
-            ? " High partner diversity indicates a best-of-breed sourcing strategy with minimal vendor lock-in."
-            : uniquePartners.size >= 2
-              ? " A balanced partner mix suggests selective consolidation while maintaining competitive sourcing options."
-              : " Single-vendor reliance warrants evaluation of alternative providers for risk mitigation."}
-        </>
-      )
-    }
-
-    // Bullet 4: Deal timeline & momentum
-    if (years.length > 1) {
-      const recentDeals = deals.filter((d) => parseInt(d.dealYear, 10) >= maxYear - 1).length
-      bullets.push(
-        <><B>{recentDeals}</B> of <B>{deals.length}</B> deals were initiated in the last two years ({maxYear - 1}–{maxYear}),
-          {recentDeals >= deals.length * 0.5
-            ? " indicating accelerating partnership activity and growing investment in external capabilities."
-            : " suggesting a mature, steady-state partnership portfolio with selective new additions."}
-        </>
-      )
-    }
-
-    return { summary, bullets }
-  }, [deals])
 
   if (selectedIndex !== null) {
     return (
@@ -207,35 +102,32 @@ export function DealView({ deals }: DealViewProps) {
   return (
     <div className="px-6 sm:px-8 py-6 space-y-6">
       {/* Analyst Overview */}
-      <Card className="border-border/60 shadow-sm">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
-            <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
-              <FileText className="w-4 h-4 text-brand-orange" />
-            </div>
-            Analyst Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-foreground/80 leading-relaxed mb-4">
-            {analysis.summary}
-          </p>
-          <div className="space-y-2.5">
-            {analysis.bullets.map((bullet, idx) => (
-              <div key={idx} className="flex items-start gap-2.5">
-                <div
-                  className={`w-1.5 h-1.5 rounded-full mt-[7px] flex-shrink-0 ${
-                    idx % 2 === 0 ? "bg-brand-blue" : "bg-brand-orange"
-                  }`}
-                />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  {bullet}
-                </p>
+      {analystNotes && analystNotes.notes.length > 0 && (
+        <Card className="border-border/60 shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
+              <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
+                <FileText className="w-4 h-4 text-brand-orange" />
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              Analyst Overview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2.5">
+              {analystNotes.notes.map((note, idx) => (
+                <div key={idx} className="flex items-start gap-2.5">
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full mt-[7px] flex-shrink-0 ${
+                      idx % 2 === 0 ? "bg-brand-blue" : "bg-brand-orange"
+                    }`}
+                  />
+                  <p className="text-sm text-foreground/80 leading-relaxed">{note}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Layout Switcher */}
       <div className="flex items-center gap-1 p-1 bg-muted/50 rounded-lg w-fit">

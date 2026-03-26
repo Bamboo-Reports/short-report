@@ -7,99 +7,147 @@ import type {
   TechStackInfo,
   GccSnapshotInfo,
   OpportunityInfo,
+  FinancialYearData,
+  AnalystNoteData,
 } from "@/types/dashboard"
-import { DEFAULT_BUSINESS, DEFAULT_CENTERS, DEFAULT_CONTACTS, DEFAULT_DEALS, DEFAULT_TECH_STACK, DEFAULT_GCC_SNAPSHOT, DEFAULT_OPPORTUNITIES } from "./default-data"
 
-export function getBusinessInfo(data?: DashboardData): BusinessInfo {
+function parseBulletString(value?: string): string[] {
+  if (!value) return []
+  return value
+    .split("\n")
+    .map((line) => line.replace(/^[•\-\s]+/, "").trim())
+    .filter(Boolean)
+}
+
+export function getBusinessInfo(data?: DashboardData): BusinessInfo | null {
   if (!data?.business || data.business.length === 0) {
-    return DEFAULT_BUSINESS
+    return null
   }
 
   const b = data.business[0]
+
+  const services = data.services && data.services.length > 0
+    ? data.services
+    : b.services
+      ? parseBulletString(b.services)
+      : [b.service1, b.service2, b.service3, b.service4].filter(
+          (s): s is string => Boolean(s),
+        )
+
+  const executives = data.executives && data.executives.length > 0
+    ? data.executives
+    : []
+
+  const competitors = data.competitors && data.competitors.length > 0
+    ? data.competitors
+    : []
+
   return {
     name: b.companyName || "Company Name",
-    incYear: b.incYear || "2024",
-    revenue: b.revenue || "$0",
-    employees: b.employees || "0",
-    headquarters: b.headquarters || "Location",
-    industry: b.industry || "Industry",
+    incYear: b.incYear || "",
+    revenue: b.revenue || "",
+    employees: b.employees || "",
+    headquarters: b.headquarters || "",
+    industry: b.industry || "",
     companyType: b.companyType || "Private",
-    services: [b.service1, b.service2, b.service3, b.service4].filter(
-      (s): s is string => Boolean(s),
-    ),
-    about: b.about || "Company description not available.",
+    services,
+    about: b.about || "",
     socialLinks: {
-      website: b.website || DEFAULT_BUSINESS.socialLinks.website,
-      linkedin: b.linkedin || DEFAULT_BUSINESS.socialLinks.linkedin,
-      twitter: b.twitter || DEFAULT_BUSINESS.socialLinks.twitter,
-      instagram: b.instagram || DEFAULT_BUSINESS.socialLinks.instagram,
+      website: b.website || "",
+      linkedin: b.linkedin || "",
+      twitter: b.twitter || "",
+      instagram: b.instagram || "",
     },
-    stockTicker: b.stockTicker || DEFAULT_BUSINESS.stockTicker,
+    stockTicker: b.stockTicker || "",
     financials: {
-      revenue: b.revenue || DEFAULT_BUSINESS.financials.revenue,
-      netIncome: b.netIncome || DEFAULT_BUSINESS.financials.netIncome,
-      marketCap: b.marketCap || DEFAULT_BUSINESS.financials.marketCap,
-      stockPrice: b.stockPrice || DEFAULT_BUSINESS.financials.stockPrice,
+      revenue: b.revenue || "",
+      netIncome: b.netIncome || "",
+      marketCap: b.marketCap || "",
+      stockPrice: b.stockPrice || "",
     },
-    executives: DEFAULT_BUSINESS.executives,
-    competitors: DEFAULT_BUSINESS.competitors,
+    executives,
+    competitors,
   }
 }
 
 export function getCenterInfo(data?: DashboardData): CenterInfo[] {
   if (!data?.center || data.center.length === 0) {
-    return DEFAULT_CENTERS
+    return []
   }
 
-  return data.center.map((c) => ({
-    legalName: c.legalName || "Legal Name",
-    incYear: c.incYear || "2024",
-    centerType: c.centerType || "IT",
-    location: c.location || "Location",
-    employeeCount: c.employeeCount || "0",
-    focusRegions: [c.focusRegion1, c.focusRegion2, c.focusRegion3].filter(
-      (r): r is string => Boolean(r),
-    ),
-    services: {
-      "IT Services": [c.itService1, c.itService2, c.itService3].filter(
-        (s): s is string => Boolean(s),
-      ),
-    },
-    techStack: [c.techStack1, c.techStack2, c.techStack3].filter(
-      (t): t is string => Boolean(t),
-    ),
-    address: c.address || "Address not provided",
-    phone: c.phone || null,
-    accountName: c.accountName || "Account Name",
-    domain: c.domain || "",
-  }))
+  return data.center.map((c) => {
+    let services: Record<string, string[]>
+    if (c.services && Object.keys(c.services).length > 0) {
+      services = {}
+      for (const [category, serviceStr] of Object.entries(c.services)) {
+        services[category] = parseBulletString(serviceStr)
+      }
+    } else {
+      services = {
+        "IT Services": [c.itService1, c.itService2, c.itService3].filter(
+          (s): s is string => Boolean(s),
+        ),
+      }
+    }
+
+    const focusRegions = c.focusRegions
+      ? parseBulletString(c.focusRegions)
+      : [c.focusRegion1, c.focusRegion2, c.focusRegion3].filter(
+          (r): r is string => Boolean(r),
+        )
+
+    const techStack = c.techStack
+      ? parseBulletString(c.techStack)
+      : [c.techStack1, c.techStack2, c.techStack3].filter(
+          (t): t is string => Boolean(t),
+        )
+
+    return {
+      legalName: c.legalName || "Legal Name",
+      incYear: c.incYear || "",
+      centerType: c.centerType || "IT",
+      location: c.location || "",
+      employeeCount: c.employeeCount || "0",
+      focusRegions,
+      services,
+      techStack,
+      address: c.address || "",
+      phone: c.phone || null,
+      accountName: c.accountName || "",
+      domain: c.domain || "",
+      latitude: c.latitude,
+      longitude: c.longitude,
+      analystNotes: c.analystNotes,
+    }
+  })
 }
 
 export function getContactInfo(data?: DashboardData): ContactInfo[] {
   if (!data?.contact || data.contact.length === 0) {
-    return DEFAULT_CONTACTS
+    return []
   }
 
   return data.contact.map((c) => ({
-    accountName: c.accountName || "Account Name",
-    entityName: c.entityName || "Entity Name",
-    firstName: c.firstName || "First",
-    lastName: c.lastName || "Last",
-    designation: c.designation || "Position",
-    email: c.email || "email@example.com",
-    city: c.city || "City",
-    state: c.state || "State",
-    country: c.country || "Country",
+    accountName: c.accountName || "",
+    entityName: c.entityName || "",
+    firstName: c.firstName || "",
+    lastName: c.lastName || "",
+    designation: c.designation || "",
+    email: c.email || "",
+    city: c.city || "",
+    state: c.state || "",
+    country: c.country || "",
     linkedin: c.linkedin || "",
     career: parseBulletString(c.career),
     currentProfile: parseBulletString(c.currentProfile),
     qualifications: parseBulletString(c.qualification),
+    profileImage: c.profileImage || undefined,
   }))
 }
 
 export function getDealInfo(data?: DashboardData): DealInfo[] {
   if (!data?.deal || data.deal.length === 0) {
-    return DEFAULT_DEALS
+    return []
   }
 
   return data.deal.map((d) => ({
@@ -121,7 +169,7 @@ export function getDealInfo(data?: DashboardData): DealInfo[] {
 
 export function getTechStackInfo(data?: DashboardData): TechStackInfo[] {
   if (!data?.techStack || data.techStack.length === 0) {
-    return DEFAULT_TECH_STACK
+    return []
   }
 
   return data.techStack.map((t) => ({
@@ -132,46 +180,44 @@ export function getTechStackInfo(data?: DashboardData): TechStackInfo[] {
   }))
 }
 
-export function getGccSnapshot(centers: CenterInfo[], contacts: ContactInfo[]): GccSnapshotInfo {
-  if (centers.length === 0 && contacts.length === 0) {
-    return DEFAULT_GCC_SNAPSHOT
+export function getGccSnapshot(centers: CenterInfo[], contacts: ContactInfo[], data?: DashboardData): GccSnapshotInfo | null {
+  if (centers.length === 0) {
+    return null
   }
 
   const currentHeadcount = centers.reduce((sum, c) => sum + (parseInt(c.employeeCount, 10) || 0), 0)
 
-  const defaultCenter = (city: string) => DEFAULT_GCC_SNAPSHOT.centers.find((dc) => dc.city === city)
-
-  const centerSnapshots = centers.map((c) => {
-    const dc = defaultCenter(c.location)
-    return {
-      city: c.location,
-      centerName: c.legalName,
-      centerType: c.centerType,
-      incYear: c.incYear,
-      employeeCount: c.employeeCount,
-      analystNote: dc?.analystNote
-        || `Supports ${c.accountName}'s operations with focus on ${Object.keys(c.services).join(", ").toLowerCase()}.`,
-      lat: dc?.lat || 20.5937,
-      lng: dc?.lng || 78.9629,
-    }
-  })
+  const centerSnapshots = centers.map((c) => ({
+    city: c.location,
+    centerName: c.legalName,
+    centerType: c.centerType,
+    incYear: c.incYear,
+    employeeCount: c.employeeCount,
+    analystNote: c.analystNotes || "",
+    lat: c.latitude ?? 20.5937,
+    lng: c.longitude ?? 78.9629,
+  }))
 
   const keyExecutives = contacts.slice(0, 4).map((c) => ({
     name: `${c.firstName} ${c.lastName}`,
     designation: c.designation,
   }))
 
+  const headcountHistory = data?.headcountHistory && data.headcountHistory.length > 0
+    ? data.headcountHistory
+    : []
+
   return {
     centers: centerSnapshots,
     keyExecutives,
     currentHeadcount,
-    headcountHistory: DEFAULT_GCC_SNAPSHOT.headcountHistory,
+    headcountHistory,
   }
 }
 
 export function getOpportunities(data?: DashboardData): OpportunityInfo[] {
   if (!data?.opportunity || data.opportunity.length === 0) {
-    return DEFAULT_OPPORTUNITIES
+    return []
   }
 
   return data.opportunity.map((o) => ({
@@ -180,10 +226,14 @@ export function getOpportunities(data?: DashboardData): OpportunityInfo[] {
   }))
 }
 
-function parseBulletString(value?: string): string[] {
-  if (!value) return []
-  return value
-    .split("\n")
-    .map((line) => line.replace(/^[•\-\s]+/, "").trim())
-    .filter(Boolean)
+export function getFinancialData(data?: DashboardData): FinancialYearData[] | null {
+  if (!data?.financials || data.financials.length === 0) {
+    return null
+  }
+  return data.financials
+}
+
+export function getAnalystNotes(data?: DashboardData, section?: string): AnalystNoteData | null {
+  if (!data?.analystNotes || !section) return null
+  return data.analystNotes[section] || null
 }

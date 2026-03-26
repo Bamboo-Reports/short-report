@@ -18,14 +18,15 @@ import {
   BarChart3,
   FileText,
 } from "lucide-react"
-import type { BusinessInfo } from "@/types/dashboard"
+import type { BusinessInfo, AnalystNoteData } from "@/types/dashboard"
 import { RevenueChart } from "./revenue-chart"
 
 interface BusinessViewProps {
   businessInfo: BusinessInfo
+  analystNotes?: AnalystNoteData | null
 }
 
-export function BusinessView({ businessInfo }: BusinessViewProps) {
+export function BusinessView({ businessInfo, analystNotes }: BusinessViewProps) {
   return (
     <div className="px-6 sm:px-8 py-6">
       <div className="space-y-6">
@@ -114,44 +115,32 @@ export function BusinessView({ businessInfo }: BusinessViewProps) {
         </div>
 
         {/* Analyst Notes */}
-        <Card className="border-border/60 shadow-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
-              <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
-                <FileText className="w-4 h-4 text-brand-orange" />
+        {analystNotes && analystNotes.notes.length > 0 && (
+          <Card className="border-border/60 shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
+                <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-brand-orange" />
+                </div>
+                Analyst Notes
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2.5">
+                {analystNotes.notes.map((note, idx) => (
+                  <div key={idx} className="flex items-start gap-2.5">
+                    <div
+                      className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-[7px] ${
+                        idx % 2 === 0 ? "bg-brand-blue" : "bg-brand-orange"
+                      }`}
+                    />
+                    <p className="text-sm text-foreground/80 leading-relaxed">{note}</p>
+                  </div>
+                ))}
               </div>
-              Analyst Notes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2.5">
-              <div className="flex items-start gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand-blue flex-shrink-0 mt-[7px]" />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  Revenue stands at <span className="font-semibold text-foreground">$2,167 Mn</span> with a net income of <span className="font-semibold text-foreground">$430 Mn</span>, reflecting a healthy <span className="font-semibold text-foreground">~19.8% profit margin</span> — a strong indicator of operational efficiency in the cybersecurity SaaS space.
-                </p>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand-orange flex-shrink-0 mt-[7px]" />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  Market cap of <span className="font-semibold text-foreground">$31.2 Bn</span> implies a <span className="font-semibold text-foreground">~14.4x revenue multiple</span>, signaling the market continues to price in significant growth expectations despite the recent stock pullback.
-                </p>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand-blue flex-shrink-0 mt-[7px]" />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  Stock price has retreated from its 2024–25 peak of ~$260 to the current <span className="font-semibold text-foreground">$213.45</span>, a <span className="font-semibold text-foreground">~18% correction</span>. The 5-year chart shows cyclical volatility — the 2021–23 drawdown recovered fully before the latest downturn.
-                </p>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand-orange flex-shrink-0 mt-[7px]" />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  P/E ratio of <span className="font-semibold text-foreground">~72x</span> (based on current earnings) remains elevated, suggesting the valuation is predicated on sustained topline acceleration and margin expansion over the next 2–3 fiscal years.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* About */}
         <Card className="border-border/60 shadow-sm">

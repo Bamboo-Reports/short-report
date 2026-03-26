@@ -26,8 +26,19 @@ import { TechView } from "@/components/tech-view"
 import { GccView } from "@/components/gcc-view"
 import { OpportunityView } from "@/components/opportunity-view"
 import { KeyFinancialsView } from "@/components/key-financials-view"
-import { getBusinessInfo, getCenterInfo, getContactInfo, getDealInfo, getTechStackInfo, getGccSnapshot, getOpportunities } from "@/lib/transform-data"
+import { getBusinessInfo, getCenterInfo, getContactInfo, getDealInfo, getTechStackInfo, getGccSnapshot, getOpportunities, getFinancialData, getAnalystNotes } from "@/lib/transform-data"
 import type { DashboardData } from "@/types/dashboard"
+import { FileX } from "lucide-react"
+
+function NoData() {
+  return (
+    <div className="flex flex-col items-center justify-center py-32 text-muted-foreground">
+      <FileX className="w-12 h-12 mb-4 opacity-40" />
+      <p className="text-lg font-semibold">NO DATA FOR REPORT</p>
+      <p className="text-sm mt-1">Add data to the Excel sheet for this section.</p>
+    </div>
+  )
+}
 
 type ViewType = "business" | "financials" | "center" | "contact" | "deal" | "tech" | "gcc" | "opportunity"
 
@@ -57,13 +68,25 @@ function getInitialView(): ViewType {
   return param && VIEW_KEYS.includes(param) ? param : "business"
 }
 
-export default function BusinessDashboard({ data }: { data?: DashboardData }) {
+interface BusinessDashboardProps {
+  data?: DashboardData
+  availableReports?: string[]
+  selectedReport?: string | null
+}
+
+export default function BusinessDashboard({ data, availableReports = [], selectedReport }: BusinessDashboardProps) {
   const [currentView, setCurrentViewState] = useState<ViewType>(getInitialView)
 
   const setCurrentView = useCallback((view: ViewType) => {
     setCurrentViewState(view)
-    const url = view === "business" ? window.location.pathname : `${window.location.pathname}?view=${view}`
-    window.history.replaceState(null, "", url)
+    const params = new URLSearchParams(window.location.search)
+    if (view === "business") {
+      params.delete("view")
+    } else {
+      params.set("view", view)
+    }
+    const qs = params.toString()
+    window.history.replaceState(null, "", qs ? `${window.location.pathname}?${qs}` : window.location.pathname)
   }, [])
 
   const businessInfo = useMemo(() => getBusinessInfo(data), [data])
@@ -71,8 +94,9 @@ export default function BusinessDashboard({ data }: { data?: DashboardData }) {
   const contactInfo = useMemo(() => getContactInfo(data), [data])
   const dealInfo = useMemo(() => getDealInfo(data), [data])
   const techStackInfo = useMemo(() => getTechStackInfo(data), [data])
-  const gccSnapshot = useMemo(() => getGccSnapshot(centerInfo, contactInfo), [centerInfo, contactInfo])
+  const gccSnapshot = useMemo(() => getGccSnapshot(centerInfo, contactInfo, data), [centerInfo, contactInfo, data])
   const opportunityInfo = useMemo(() => getOpportunities(data), [data])
+  const financialData = useMemo(() => getFinancialData(data), [data])
 
   const currentViewIndex = VIEWS.findIndex((view) => view.key === currentView)
   const CurrentIcon = VIEWS[currentViewIndex].icon
@@ -83,6 +107,12 @@ export default function BusinessDashboard({ data }: { data?: DashboardData }) {
         ? (currentViewIndex - 1 + VIEWS.length) % VIEWS.length
         : (currentViewIndex + 1) % VIEWS.length
     setCurrentView(VIEWS[newIndex].key)
+  }
+
+  const handleCompanyChange = (report: string) => {
+    const params = new URLSearchParams(window.location.search)
+    params.set("company", report)
+    window.location.href = `${window.location.pathname}?${params.toString()}`
   }
 
   return (
@@ -125,25 +155,42 @@ export default function BusinessDashboard({ data }: { data?: DashboardData }) {
               </div>
             </div>
 
-            <div className="hidden sm:flex items-center gap-1">
-              {SOCIAL_ICONS.map(({ key, icon: Icon, label }) => (
-                <Button
-                  key={key}
-                  variant="ghost"
-                  size="sm"
-                  className="w-9 h-9 p-0 text-white/60 hover:text-white hover:bg-white/10 rounded-lg"
-                  aria-label={label}
-                  asChild
+            <div className="flex items-center gap-3">
+              {/* Company Selector */}
+              {availableReports.length > 1 && (
+                <select
+                  value={selectedReport || ""}
+                  onChange={(e) => handleCompanyChange(e.target.value)}
+                  className="bg-white/10 border border-white/20 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-white/30 cursor-pointer"
                 >
-                  <a
-                    href={businessInfo.socialLinks[key]}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  {availableReports.map((report) => (
+                    <option key={report} value={report} className="text-foreground bg-background">
+                      {report}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              <div className="hidden sm:flex items-center gap-1">
+                {SOCIAL_ICONS.map(({ key, icon: Icon, label }) => (
+                  <Button
+                    key={key}
+                    variant="ghost"
+                    size="sm"
+                    className="w-9 h-9 p-0 text-white/60 hover:text-white hover:bg-white/10 rounded-lg"
+                    aria-label={label}
+                    asChild
                   >
-                    <Icon className="w-4 h-4" />
-                  </a>
-                </Button>
-              ))}
+                    <a
+                      href={businessInfo?.socialLinks[key] || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Icon className="w-4 h-4" />
+                    </a>
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -180,14 +227,14 @@ export default function BusinessDashboard({ data }: { data?: DashboardData }) {
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-[1400px] mx-auto">
-          {currentView === "business" && <BusinessView businessInfo={businessInfo} />}
-          {currentView === "financials" && <KeyFinancialsView />}
-          {currentView === "center" && <CenterView centers={centerInfo} />}
-          {currentView === "contact" && <ContactView contacts={contactInfo} />}
-          {currentView === "deal" && <DealView deals={dealInfo} />}
-          {currentView === "tech" && <TechView techStack={techStackInfo} />}
-          {currentView === "gcc" && <GccView snapshot={gccSnapshot} />}
-          {currentView === "opportunity" && <OpportunityView opportunities={opportunityInfo} />}
+          {currentView === "business" && (businessInfo ? <BusinessView businessInfo={businessInfo} analystNotes={getAnalystNotes(data, "Business Snapshot")} /> : <NoData />)}
+          {currentView === "financials" && (financialData ? <KeyFinancialsView financials={financialData} /> : <NoData />)}
+          {currentView === "center" && (centerInfo.length > 0 ? <CenterView centers={centerInfo} analystNotes={getAnalystNotes(data, "Center Details")} /> : <NoData />)}
+          {currentView === "contact" && (contactInfo.length > 0 ? <ContactView contacts={contactInfo} analystNotes={getAnalystNotes(data, "Contact Details")} /> : <NoData />)}
+          {currentView === "deal" && (dealInfo.length > 0 ? <DealView deals={dealInfo} analystNotes={getAnalystNotes(data, "Deal Details")} /> : <NoData />)}
+          {currentView === "tech" && (techStackInfo.length > 0 ? <TechView techStack={techStackInfo} analystNotes={getAnalystNotes(data, "Tech Details")} /> : <NoData />)}
+          {currentView === "gcc" && (gccSnapshot ? <GccView snapshot={gccSnapshot} analystNotes={getAnalystNotes(data, "GCC Snapshot")} /> : <NoData />)}
+          {currentView === "opportunity" && (opportunityInfo.length > 0 ? <OpportunityView opportunities={opportunityInfo} analystNotes={getAnalystNotes(data, "Opportunity Map")} /> : <NoData />)}
         </div>
 
         {/* Footer */}

@@ -1,6 +1,5 @@
 "use client"
 
-import { useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Building2, Users, TrendingUp, UserCheck, Map, MapPin, Calendar, FileText } from "lucide-react"
@@ -12,82 +11,14 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 import { Area, AreaChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts"
-import type { GccSnapshotInfo } from "@/types/dashboard"
+import type { GccSnapshotInfo, AnalystNoteData } from "@/types/dashboard"
 
 interface GccViewProps {
   snapshot: GccSnapshotInfo
+  analystNotes?: AnalystNoteData | null
 }
 
-export function GccView({ snapshot }: GccViewProps) {
-  const analysis = useMemo(() => {
-    const B = ({ children }: { children: React.ReactNode }) => (
-      <span className="font-semibold text-foreground">{children}</span>
-    )
-
-    const totalHeadcount = snapshot.currentHeadcount
-    const centerCount = snapshot.centers.length
-    const uniqueCities = [...new Set(snapshot.centers.map((c) => c.city))]
-    const uniqueTypes = [...new Set(snapshot.centers.map((c) => c.centerType))]
-
-    const oldest = snapshot.centers.reduce((prev, curr) => {
-      const py = parseInt(prev.incYear, 10) || 9999
-      const cy = parseInt(curr.incYear, 10) || 9999
-      return cy < py ? curr : prev
-    }, snapshot.centers[0])
-
-    const largest = snapshot.centers.reduce((prev, curr) => {
-      const pc = parseInt(prev.employeeCount.replace(/[^0-9]/g, ""), 10) || 0
-      const cc = parseInt(curr.employeeCount.replace(/[^0-9]/g, ""), 10) || 0
-      return cc > pc ? curr : prev
-    }, snapshot.centers[0])
-
-    // Headcount growth
-    const history = snapshot.headcountHistory
-    let growthNote: React.ReactNode = null
-    if (history.length >= 2) {
-      const first = history[0]
-      const last = history[history.length - 1]
-      const growthPct = first.count > 0 ? Math.round(((last.count - first.count) / first.count) * 100) : 0
-      growthNote = (
-        <>Headcount has grown <B>{growthPct}%</B> from <B>{first.count.toLocaleString()}</B> ({first.year}) to{" "}
-          <B>{last.count.toLocaleString()}</B> ({last.year}),
-          {growthPct >= 50
-            ? " reflecting aggressive scaling of India operations — this trajectory signals increasing strategic reliance on the India talent pool."
-            : growthPct >= 20
-              ? " indicating steady, sustained investment in the India geography as a key delivery hub."
-              : " suggesting a mature, stabilized workforce with selective hiring focused on specialized roles."}
-        </>
-      )
-    }
-
-    const summary = (
-      <>
-        The India GCC footprint spans <B>{centerCount} center{centerCount !== 1 ? "s" : ""}</B> across{" "}
-        <B>{uniqueCities.join(" and ")}</B>, with a combined workforce of{" "}
-        <B>{totalHeadcount.toLocaleString()} employees</B>.
-        {oldest && <>{" "}The earliest center was established in <B>{oldest.incYear}</B> in <B>{oldest.city}</B>, giving the organization a <B>{new Date().getFullYear() - parseInt(oldest.incYear, 10)}+ year</B> India presence.</>}
-      </>
-    )
-
-    const bullets: React.ReactNode[] = []
-
-    // Bullet 1: Largest center
-    if (largest) {
-      const largestCount = parseInt(largest.employeeCount.replace(/[^0-9]/g, ""), 10) || 0
-      const largestPct = totalHeadcount > 0 ? Math.round((largestCount / totalHeadcount) * 100) : 0
-      bullets.push(
-        <><B>{largest.city}</B> is the primary hub with <B>{largest.employeeCount} employees</B> (<B>{largestPct}%</B> of India headcount), serving as the anchor for delivery, engineering, and operational functions.</>
-      )
-    }
-
-    // Bullet 2: Growth trajectory
-    if (growthNote) {
-      bullets.push(growthNote)
-    }
-
-    return { summary, bullets }
-  }, [snapshot])
-
+export function GccView({ snapshot, analystNotes }: GccViewProps) {
   return (
     <div className="px-6 sm:px-8 py-6 space-y-6">
       {/* Summary Metrics Strip */}
@@ -113,35 +44,32 @@ export function GccView({ snapshot }: GccViewProps) {
       </div>
 
       {/* Analyst Overview */}
-      <Card className="border-border/60 shadow-sm">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
-            <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
-              <FileText className="w-4 h-4 text-brand-orange" />
-            </div>
-            Analyst Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-foreground/80 leading-relaxed mb-4">
-            {analysis.summary}
-          </p>
-          <div className="space-y-2.5">
-            {analysis.bullets.map((bullet, idx) => (
-              <div key={idx} className="flex items-start gap-2.5">
-                <div
-                  className={`w-1.5 h-1.5 rounded-full mt-[7px] flex-shrink-0 ${
-                    idx % 2 === 0 ? "bg-brand-blue" : "bg-brand-orange"
-                  }`}
-                />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  {bullet}
-                </p>
+      {analystNotes && analystNotes.notes.length > 0 && (
+        <Card className="border-border/60 shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
+              <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
+                <FileText className="w-4 h-4 text-brand-orange" />
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              Analyst Overview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2.5">
+              {analystNotes.notes.map((note, idx) => (
+                <div key={idx} className="flex items-start gap-2.5">
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full mt-[7px] flex-shrink-0 ${
+                      idx % 2 === 0 ? "bg-brand-blue" : "bg-brand-orange"
+                    }`}
+                  />
+                  <p className="text-sm text-foreground/80 leading-relaxed">{note}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Centers + Map */}
       <div className="grid lg:grid-cols-3 gap-6">

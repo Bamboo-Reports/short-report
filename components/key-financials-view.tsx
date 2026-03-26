@@ -9,18 +9,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts"
-
-const revenueData = [
-  { year: "2023", revenue: 6761 },
-  { year: "2024", revenue: 6774 },
-  { year: "2025", revenue: 8290 },
-]
-
-const incomeData = [
-  { year: "2023", netIncome: 1336, operatingIncome: 191.3 },
-  { year: "2024", netIncome: 1107, operatingIncome: 228.7 },
-  { year: "2025", netIncome: 2031, operatingIncome: 1157 },
-]
+import type { FinancialYearData } from "@/types/dashboard"
 
 const revenueChartConfig = {
   revenue: {
@@ -40,7 +29,16 @@ const incomeChartConfig = {
   },
 } satisfies ChartConfig
 
-export function KeyFinancialsView() {
+interface KeyFinancialsViewProps {
+  financials?: FinancialYearData[] | null
+}
+
+export function KeyFinancialsView({ financials }: KeyFinancialsViewProps) {
+  const revenueData = (financials || []).map((f) => ({ year: f.year, revenue: f.revenue }))
+  const incomeData = (financials || []).map((f) => ({ year: f.year, netIncome: f.netIncome, operatingIncome: f.operatingIncome }))
+
+  const yearCount = revenueData.length
+
   return (
     <div className="p-6 sm:p-8 space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -53,7 +51,7 @@ export function KeyFinancialsView() {
               </div>
               Revenue
               <span className="text-xs font-normal text-muted-foreground ml-auto">
-                Last 3 Years &middot; USD Mn
+                Last {yearCount} Years &middot; USD Mn
               </span>
             </CardTitle>
           </CardHeader>
@@ -122,7 +120,7 @@ export function KeyFinancialsView() {
               </div>
               Income
               <span className="text-xs font-normal text-muted-foreground ml-auto">
-                Net &amp; Operating &middot; USD Mn
+                Net &amp; Operating &middot; Last {yearCount} Years &middot; USD Mn
               </span>
             </CardTitle>
           </CardHeader>
