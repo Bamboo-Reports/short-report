@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -29,8 +29,9 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { CheckCircle2 } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 import { DealMagazine } from "./deal-view-magazine"
-import type { DealInfo } from "@/types/dashboard"
+import type { DealInfo, AnalystNoteData } from "@/types/dashboard"
 
 type DealLayout = "table" | "magazine"
 
@@ -43,6 +44,7 @@ const LAYOUT_OPTIONS: { key: DealLayout; label: string; icon: React.ComponentTyp
 
 interface DealViewProps {
   deals: DealInfo[]
+  analystNotes?: AnalystNoteData | null
 }
 
 interface DealGroup {
@@ -65,131 +67,30 @@ function groupBySolutionType(deals: DealInfo[]): DealGroup[] {
 
 function PartnerLogo({ domain, size = 28 }: { domain: string; size?: number }) {
   const cleanDomain = domain.replace(/^(https?:\/\/)?(www\.)?/, "").replace(/\/$/, "")
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState(false)
+  if (error) return null
   return (
-    <img
-      src={`https://img.logo.dev/${cleanDomain}?token=${process.env.NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY}&size=64&format=png`}
-      alt={`${cleanDomain} logo`}
-      width={size}
-      height={size}
-      className="rounded-md object-contain flex-shrink-0"
-      onError={(e) => {
-        e.currentTarget.style.display = "none"
-      }}
-    />
+    <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
+      {!loaded && <Skeleton className="absolute inset-0 rounded-md" />}
+      <img
+        src={`https://img.logo.dev/${cleanDomain}?token=${process.env.NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY}&size=64&format=png`}
+        alt={`${cleanDomain} logo`}
+        width={size}
+        height={size}
+        className={`rounded-md object-contain flex-shrink-0 transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+        onLoad={() => setLoaded(true)}
+        onError={() => setError(true)}
+      />
+    </div>
   )
 }
 
-export function DealView({ deals }: DealViewProps) {
+export function DealView({ deals, analystNotes }: DealViewProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [layout, setLayout] = useState<DealLayout>("table")
 
   const groups = groupBySolutionType(deals)
-
-  const analysis = useMemo(() => {
-    const B = ({ children }: { children: React.ReactNode }) => (
-      <span className="font-semibold text-foreground">{children}</span>
-    )
-
-    // Deal type distribution
-    const dealTypeCounts: Record<string, number> = {}
-    deals.forEach((d) => {
-      dealTypeCounts[d.dealType] = (dealTypeCounts[d.dealType] || 0) + 1
-    })
-    const dominantDealType = Object.entries(dealTypeCounts).sort((a, b) => b[1] - a[1])[0]
-
-    // Solution type distribution
-    const solutionTypeCounts: Record<string, number> = {}
-    deals.forEach((d) => {
-      if (d.solutionType) solutionTypeCounts[d.solutionType] = (solutionTypeCounts[d.solutionType] || 0) + 1
-    })
-    const topSolutionType = Object.entries(solutionTypeCounts).sort((a, b) => b[1] - a[1])[0]
-
-    // Unique partners
-    const uniquePartners = new Set(deals.map((d) => d.partnerName).filter(Boolean))
-
-    // Country spread
-    const countryCounts: Record<string, number> = {}
-    deals.forEach((d) => {
-      if (d.country) countryCounts[d.country] = (countryCounts[d.country] || 0) + 1
-    })
-    const sortedCountries = Object.entries(countryCounts).sort((a, b) => b[1] - a[1])
-
-    // Year range
-    const years = deals.map((d) => parseInt(d.dealYear, 10)).filter((y) => !isNaN(y))
-    const minYear = Math.min(...years)
-    const maxYear = Math.max(...years)
-
-    // Account name
-    const accountName = deals[0]?.companyEntity || "The organization"
-
-    const summary = (
-      <>
-        {accountName} has executed <B>{deals.length} deal{deals.length !== 1 ? "s" : ""}</B> with{" "}
-        <B>{uniquePartners.size} partner{uniquePartners.size !== 1 ? "s" : ""}</B> across{" "}
-        <B>{sortedCountries.length} {sortedCountries.length === 1 ? "country" : "countries"}</B>
-        {years.length > 0 && <>, spanning from <B>{minYear}</B> to <B>{maxYear}</B></>}.
-        {dominantDealType && <>{" "}The dominant engagement model is <B>{dominantDealType[0]}</B>, accounting for{" "}
-          <B>{dominantDealType[1]}</B> of {deals.length} deals.</>}
-      </>
-    )
-
-    const bullets: React.ReactNode[] = []
-
-    // Bullet 1: Solution type focus
-    if (topSolutionType) {
-      bullets.push(
-        <><B>{topSolutionType[0]}</B> is the primary solution focus with <B>{topSolutionType[1]} deal{topSolutionType[1] !== 1 ? "s" : ""}</B>
-          {solutionTypeCounts && Object.keys(solutionTypeCounts).length > 1
-            ? <>, followed by {Object.entries(solutionTypeCounts).sort((a, b) => b[1] - a[1]).slice(1, 3).map(([type, count], i) => (
-                <span key={type}>{i > 0 && " and "}<B>{type}</B> ({count})</span>
-              ))}. This diversification across solution categories reduces vendor concentration risk.</>
-            : ". A single-category focus suggests deep specialization in this domain."}
-        </>
-      )
-    }
-
-    // Bullet 2: Geographic reach
-    if (sortedCountries.length > 0) {
-      const topCountry = sortedCountries[0]
-      const topCountryPct = deals.length > 0 ? Math.round((topCountry[1] / deals.length) * 100) : 0
-      bullets.push(
-        <><B>{topCountryPct}%</B> of deals are concentrated in <B>{topCountry[0]}</B>
-          {sortedCountries.length > 1
-            ? <>, with additional activity in {sortedCountries.slice(1, 4).map(([country], i) => (
-                <span key={country}>{i > 0 && ", "}<B>{country}</B></span>
-              ))}. Cross-border deal activity signals a globally integrated procurement strategy.</>
-            : ". A single-geography focus may present expansion opportunities in other markets."}
-        </>
-      )
-    }
-
-    // Bullet 3: Partner ecosystem
-    if (uniquePartners.size > 0) {
-      bullets.push(
-        <>The partner ecosystem includes <B>{uniquePartners.size} distinct vendor{uniquePartners.size !== 1 ? "s" : ""}</B>.
-          {uniquePartners.size >= deals.length * 0.8
-            ? " High partner diversity indicates a best-of-breed sourcing strategy with minimal vendor lock-in."
-            : uniquePartners.size >= 2
-              ? " A balanced partner mix suggests selective consolidation while maintaining competitive sourcing options."
-              : " Single-vendor reliance warrants evaluation of alternative providers for risk mitigation."}
-        </>
-      )
-    }
-
-    // Bullet 4: Deal timeline & momentum
-    if (years.length > 1) {
-      const recentDeals = deals.filter((d) => parseInt(d.dealYear, 10) >= maxYear - 1).length
-      bullets.push(
-        <><B>{recentDeals}</B> of <B>{deals.length}</B> deals were initiated in the last two years ({maxYear - 1}–{maxYear}),
-          {recentDeals >= deals.length * 0.5
-            ? " indicating accelerating partnership activity and growing investment in external capabilities."
-            : " suggesting a mature, steady-state partnership portfolio with selective new additions."}
-        </>
-      )
-    }
-
-    return { summary, bullets }
-  }, [deals])
 
   if (selectedIndex !== null) {
     return (
@@ -205,47 +106,44 @@ export function DealView({ deals }: DealViewProps) {
   }
 
   return (
-    <div className="px-6 sm:px-8 py-6 space-y-6">
+    <div className="px-6 sm:px-8 py-6 space-y-6 animate-fade-in-up">
       {/* Analyst Overview */}
-      <Card className="border-border/60 shadow-sm">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
-            <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
-              <FileText className="w-4 h-4 text-brand-orange" />
-            </div>
-            Analyst Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-foreground/80 leading-relaxed mb-4">
-            {analysis.summary}
-          </p>
-          <div className="space-y-2.5">
-            {analysis.bullets.map((bullet, idx) => (
-              <div key={idx} className="flex items-start gap-2.5">
-                <div
-                  className={`w-1.5 h-1.5 rounded-full mt-[7px] flex-shrink-0 ${
-                    idx % 2 === 0 ? "bg-brand-blue" : "bg-brand-orange"
-                  }`}
-                />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  {bullet}
-                </p>
+      {analystNotes && analystNotes.notes.length > 0 && (
+        <Card className="card-accent-orange border-border/60 shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
+              <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
+                <FileText className="w-4 h-4 text-brand-orange" />
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              Analyst Overview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2.5">
+              {analystNotes.notes.map((note, idx) => (
+                <div key={idx} className="flex items-start gap-2.5">
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full mt-[7px] flex-shrink-0 ${
+                      idx % 2 === 0 ? "bg-brand-blue" : "bg-brand-orange"
+                    }`}
+                  />
+                  <p className="text-sm text-foreground/80 leading-relaxed">{note}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Layout Switcher */}
-      <div className="flex items-center gap-1 p-1 bg-muted/50 rounded-lg w-fit">
+      <div className="flex items-center gap-1 p-1 bg-muted/40 border border-border/40 rounded-lg w-fit">
         {LAYOUT_OPTIONS.map(({ key, label, icon: Icon }) => (
           <button
             key={key}
             onClick={() => setLayout(key)}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
               layout === key
-                ? "bg-background text-foreground shadow-sm"
+                ? "bg-background text-foreground shadow-executive"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -257,7 +155,8 @@ export function DealView({ deals }: DealViewProps) {
 
       {/* Deal Views */}
       {layout === "table" && (
-        <Card className="border-border/60 shadow-sm">
+        <Card className="border-border/60 shadow-executive">
+          <div className="h-0.5 bg-gradient-to-r from-brand-blue via-brand-blue-light to-transparent" />
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
               <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
@@ -272,18 +171,18 @@ export function DealView({ deals }: DealViewProps) {
           <CardContent className="p-0">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/30 hover:bg-muted/30">
-                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground pl-6">Solution Type</TableHead>
-                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Year</TableHead>
-                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Partner Name</TableHead>
-                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Company Entity</TableHead>
-                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Solution</TableHead>
+                <TableRow className="bg-muted/40 hover:bg-muted/40">
+                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80 pl-6">Solution Type</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80">Year</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80">Partner Name</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80">Company Entity</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80">Solution</TableHead>
                   {DEAL_TYPE_COLUMNS.map((col) => (
-                    <TableHead key={col} className="text-xs font-medium uppercase tracking-wider text-muted-foreground text-center">
+                    <TableHead key={col} className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80 text-center">
                       {col.replace(" Deal", "").replace(" Deals", "")}
                     </TableHead>
                   ))}
-                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground text-center pr-6">Details</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80 text-center pr-6">Details</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -294,7 +193,7 @@ export function DealView({ deals }: DealViewProps) {
                     return (
                       <TableRow
                         key={item.originalIndex}
-                        className={`group hover:bg-muted/20 transition-colors ${
+                        className={`group hover:bg-muted/20 transition-colors duration-150 ${
                           isLastInGroup && groupIdx < groups.length - 1 ? "border-b-2 border-border" : ""
                         }`}
                       >
@@ -372,7 +271,7 @@ function DealDetailView({
   onNext: () => void
 }) {
   return (
-    <div className="px-6 sm:px-8 py-6 space-y-6">
+    <div className="px-6 sm:px-8 py-6 space-y-6 animate-slide-in-right">
       {/* Back Button + Navigation */}
       <div className="flex items-center justify-between">
         <Button
@@ -415,8 +314,8 @@ function DealDetailView({
       </div>
 
       {/* Deal Header Card */}
-      <Card className="border-border/60 shadow-sm overflow-hidden">
-        <div className="bg-gradient-to-r from-brand-blue/8 to-brand-blue/3 border-b border-border/60 px-6 py-5">
+      <Card className="border-border/60 shadow-executive overflow-hidden">
+        <div className="bg-gradient-to-r from-brand-blue/10 via-brand-blue/5 to-transparent border-b border-border/60 px-6 py-5">
           <div className="flex items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               {deal.partnerUrl && (
@@ -462,7 +361,7 @@ function DealDetailView({
 
       {/* Solutions */}
       {deal.solution.length > 0 && (
-        <Card className="border-border/60 shadow-sm">
+        <Card className="border-border/60 shadow-executive">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
               <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
@@ -477,7 +376,7 @@ function DealDetailView({
                 <Badge
                   key={idx}
                   variant="outline"
-                  className="text-sm px-3 py-1.5 border-brand-blue/30 text-brand-blue bg-brand-blue/5 font-medium"
+                  className="text-sm px-3 py-1.5 border-brand-blue/30 text-brand-blue bg-brand-blue/5 font-medium hover:bg-brand-blue/10 transition-colors duration-200"
                 >
                   {s}
                 </Badge>
@@ -489,7 +388,7 @@ function DealDetailView({
 
       {/* Deal Details */}
       {deal.dealDetails.length > 0 && (
-        <Card className="border-border/60 shadow-sm">
+        <Card className="card-accent-blue border-border/60 shadow-executive">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
               <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
@@ -515,7 +414,7 @@ function DealDetailView({
       {(deal.companyKeyPersons.length > 0 || deal.partnerKeyPersons.length > 0) && (
         <div className={`grid gap-6 ${deal.companyKeyPersons.length > 0 && deal.partnerKeyPersons.length > 0 ? "lg:grid-cols-2" : "grid-cols-1"}`}>
           {deal.companyKeyPersons.length > 0 && (
-            <Card className="border-border/60 shadow-sm">
+            <Card className="card-accent-orange border-border/60 shadow-executive">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
                   <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
@@ -538,7 +437,7 @@ function DealDetailView({
           )}
 
           {deal.partnerKeyPersons.length > 0 && (
-            <Card className="border-border/60 shadow-sm">
+            <Card className="card-accent-orange border-border/60 shadow-executive">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
                   <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
@@ -575,7 +474,7 @@ function FactCard({
   value: string
 }) {
   return (
-    <div className="rounded-xl bg-card border border-border/60 p-4 shadow-sm">
+    <div className="rounded-xl bg-card border border-border/60 p-4 shadow-executive hover:shadow-executive-md transition-all duration-300">
       <div className="flex items-center gap-2 mb-1.5">
         <Icon className="w-3.5 h-3.5 text-muted-foreground" />
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>

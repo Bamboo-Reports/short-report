@@ -77,6 +77,12 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      boxShadow: {
+        "executive": "0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.03)",
+        "executive-md": "0 4px 12px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04)",
+        "executive-lg": "0 10px 28px -4px rgb(0 0 0 / 0.1), 0 4px 10px -4px rgb(0 0 0 / 0.06)",
+        "header": "0 2px 16px -2px rgb(0 0 0 / 0.15), 0 1px 4px -1px rgb(0 0 0 / 0.1)",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },

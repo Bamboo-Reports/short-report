@@ -19,6 +19,9 @@ export interface BusinessData {
   netIncome?: string
   marketCap?: string
   stockPrice?: string
+  services?: string
+  executives?: string
+  competitors?: string
 }
 
 export interface BusinessInfo {
@@ -93,6 +96,12 @@ export interface CenterData {
   phone?: string | null
   accountName?: string
   domain?: string
+  focusRegions?: string
+  techStack?: string
+  latitude?: number
+  longitude?: number
+  analystNotes?: string
+  services?: Record<string, string>
 }
 
 export interface CenterInfo {
@@ -108,6 +117,9 @@ export interface CenterInfo {
   phone: string | null
   accountName: string
   domain: string
+  latitude?: number
+  longitude?: number
+  analystNotes?: string
 }
 
 export interface ContactData {
@@ -124,6 +136,7 @@ export interface ContactData {
   career?: string
   currentProfile?: string
   qualification?: string
+  profileImage?: string
 }
 
 export interface ContactInfo {
@@ -140,6 +153,7 @@ export interface ContactInfo {
   career: string[]
   currentProfile: string[]
   qualifications: string[]
+  profileImage?: string
 }
 
 export interface DealData {
@@ -221,6 +235,17 @@ export interface OpportunityInfo {
   details: string[]
 }
 
+export interface FinancialYearData {
+  year: string
+  revenue: number
+  netIncome: number
+  operatingIncome: number
+}
+
+export interface AnalystNoteData {
+  notes: string[]
+}
+
 export interface DashboardData {
   business?: BusinessData[]
   center?: CenterData[]
@@ -228,4 +253,10 @@ export interface DashboardData {
   deal?: DealData[]
   techStack?: TechStackData[]
   opportunity?: OpportunityData[]
+  executives?: ExecutiveInfo[]
+  competitors?: CompetitorInfo[]
+  services?: string[]
+  financials?: FinancialYearData[]
+  headcountHistory?: HeadcountYear[]
+  analystNotes?: Record<string, AnalystNoteData>
 }

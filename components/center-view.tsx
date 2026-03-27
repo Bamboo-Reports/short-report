@@ -20,13 +20,15 @@ import {
   Landmark,
 } from "lucide-react"
 import Image from "next/image"
-import type { CenterInfo } from "@/types/dashboard"
+import { Skeleton } from "@/components/ui/skeleton"
+import type { CenterInfo, AnalystNoteData } from "@/types/dashboard"
 
 interface CenterViewProps {
   centers: CenterInfo[]
+  analystNotes?: AnalystNoteData | null
 }
 
-export function CenterView({ centers }: CenterViewProps) {
+export function CenterView({ centers, analystNotes }: CenterViewProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
   const analytics = useMemo(() => {
@@ -72,10 +74,10 @@ export function CenterView({ centers }: CenterViewProps) {
   }
 
   return (
-    <div className="px-6 sm:px-8 py-6">
+    <div className="px-6 sm:px-8 py-6 animate-fade-in-up">
       <div className="space-y-6">
         {/* Summary Metrics Strip */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
           <MetricCard
             icon={<Building2 className="w-5 h-5" />}
             label="Total Centers"
@@ -103,89 +105,47 @@ export function CenterView({ centers }: CenterViewProps) {
         </div>
 
         {/* Analyst Narrative */}
-        <Card className="border-border/60 shadow-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
-              <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
-                <FileText className="w-4 h-4 text-brand-orange" />
+        {analystNotes && analystNotes.notes.length > 0 && (
+          <Card className="border-border/60 shadow-sm card-accent-orange">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
+                <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-brand-orange" />
+                </div>
+                Analyst Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2.5">
+                {analystNotes.notes.map((note, idx) => (
+                  <div key={idx} className="flex items-start gap-2.5">
+                    <div
+                      className={`w-1.5 h-1.5 rounded-full mt-[7px] flex-shrink-0 ${
+                        idx % 2 === 0 ? "bg-brand-blue" : "bg-brand-orange"
+                      }`}
+                    />
+                    <p className="text-sm text-foreground/80 leading-relaxed">{note}</p>
+                  </div>
+                ))}
               </div>
-              Analyst Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-foreground/80 leading-relaxed mb-4">
-              {centers[0]?.accountName} operates{" "}
-              <span className="font-semibold text-foreground">{centers.length} center{centers.length !== 1 ? "s" : ""}</span>{" "}
-              across{" "}
-              <span className="font-semibold text-foreground">{analytics.uniqueCities.length} {analytics.uniqueCities.length === 1 ? "city" : "cities"}</span>{" "}
-              in India, with a combined workforce of{" "}
-              <span className="font-semibold text-foreground">{analytics.totalHeadcount.toLocaleString()} employees</span>.
-              The footprint spans {analytics.uniqueCities.join(", ")}, covering {analytics.uniqueTypes.join(" and ")} operations.
-            </p>
-            <div className="space-y-2.5">
-              <div className="flex items-start gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand-blue flex-shrink-0 mt-[7px]" />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  The oldest center was established in{" "}
-                  <span className="font-semibold text-foreground">{analytics.oldest.incYear}</span> in{" "}
-                  <span className="font-semibold text-foreground">{analytics.oldest.location}</span>{" "}
-                  ({analytics.oldest.legalName}), anchoring the company&apos;s long-standing India presence.
-                </p>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand-orange flex-shrink-0 mt-[7px]" />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  The largest facility by headcount is in{" "}
-                  <span className="font-semibold text-foreground">{analytics.largest.location}</span> with{" "}
-                  <span className="font-semibold text-foreground">{analytics.largest.employeeCount} employees</span>{" "}
-                  ({analytics.largest.legalName}), indicating a primary hub for delivery and operations.
-                </p>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand-blue flex-shrink-0 mt-[7px]" />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  The dominant center model is{" "}
-                  <span className="font-semibold text-foreground">{analytics.dominantType}</span>, reflecting the
-                  organization&apos;s preference for {analytics.dominantType === "GBS" ? "shared-services consolidation" : "captive technology operations"} in
-                  the India geography.
-                </p>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand-orange flex-shrink-0 mt-[7px]" />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  Average center size is approximately{" "}
-                  <span className="font-semibold text-foreground">
-                    {Math.round(analytics.totalHeadcount / centers.length).toLocaleString()} employees
-                  </span>
-                  , suggesting {analytics.totalHeadcount / centers.length > 500 ? "large-scale, mature operations" : "lean, focused teams"} across
-                  the portfolio.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Center Cards Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 stagger-children">
           {centers.map((center, index) => (
             <Card
               key={index}
-              className="border-border/60 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer group"
+              className="border-border/60 shadow-executive hover:shadow-executive-md transition-all duration-300 cursor-pointer group"
               onClick={() => setSelectedIndex(index)}
             >
+              <div className="h-0.5 bg-gradient-to-r from-brand-blue/60 to-transparent" />
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     {center.domain ? (
-                      <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
-                        <Image
-                          src={`https://img.logo.dev/${center.domain}?token=${process.env.NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY}`}
-                          alt={`${center.accountName} logo`}
-                          width={40}
-                          height={40}
-                          className="object-contain w-full h-full"
-                        />
-                      </div>
+                      <LogoWithSkeleton domain={center.domain} name={center.accountName} size={40} />
                     ) : (
                       <div className="w-10 h-10 rounded-xl bg-brand-blue/10 flex items-center justify-center flex-shrink-0">
                         <Building2 className="w-5 h-5 text-brand-blue" />
@@ -279,7 +239,9 @@ function MetricCard({
   accent: "blue" | "orange"
 }) {
   return (
-    <div className="bg-card rounded-xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+    <div className={`bg-card rounded-xl border border-border/60 p-4 shadow-executive hover:shadow-executive-md transition-all duration-300 border-l-[3px] ${
+      accent === "blue" ? "border-l-brand-blue" : "border-l-brand-orange"
+    }`}>
       <div className="flex items-center gap-3 mb-3">
         <div
           className={`w-9 h-9 rounded-lg flex items-center justify-center ${
@@ -311,7 +273,7 @@ function CenterDetailView({
   onNext: () => void
 }) {
   return (
-    <div className="px-6 sm:px-8 py-6 space-y-6">
+    <div className="px-6 sm:px-8 py-6 space-y-6 animate-slide-in-right">
       {/* Back Button + Navigation */}
       <div className="flex items-center justify-between">
         <Button
@@ -354,13 +316,17 @@ function CenterDetailView({
       </div>
 
       {/* Center Header Card */}
-      <Card className="border-border/60 shadow-sm overflow-hidden">
-        <div className="bg-gradient-to-r from-brand-blue/8 to-brand-blue/3 border-b border-border/60 px-6 py-5">
+      <Card className="border-border/60 shadow-executive overflow-hidden">
+        <div className="bg-gradient-to-r from-brand-blue/10 via-brand-blue/5 to-transparent border-b border-border/60 px-6 py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-brand-blue/10 flex items-center justify-center flex-shrink-0">
-                <Building2 className="w-6 h-6 text-brand-blue" />
-              </div>
+              {center.domain ? (
+                <LogoWithSkeleton domain={center.domain} name={center.accountName} size={48} />
+              ) : (
+                <div className="w-12 h-12 rounded-xl bg-brand-blue/10 flex items-center justify-center flex-shrink-0">
+                  <Building2 className="w-6 h-6 text-brand-blue" />
+                </div>
+              )}
               <div>
                 <h2 className="text-xl font-semibold text-foreground leading-tight">{center.legalName}</h2>
                 <p className="text-sm text-muted-foreground mt-1">{center.accountName}</p>
@@ -379,7 +345,7 @@ function CenterDetailView({
       </div>
 
       {/* Services */}
-      <Card className="border-border/60 shadow-sm">
+      <Card className="border-border/60 shadow-executive">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
             <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
@@ -403,7 +369,7 @@ function CenterDetailView({
       </Card>
 
       {/* Tech Stack */}
-      <Card className="border-border/60 shadow-sm">
+      <Card className="border-border/60 shadow-executive">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
             <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
@@ -418,7 +384,7 @@ function CenterDetailView({
               <Badge
                 key={idx}
                 variant="outline"
-                className="text-sm px-3 py-1.5 border-brand-orange/30 text-brand-orange bg-brand-orange/5 font-medium"
+                className="text-sm px-3 py-1.5 border-brand-orange/30 text-brand-orange bg-brand-orange/5 font-medium hover:bg-brand-orange/10 transition-colors duration-200"
               >
                 {tech}
               </Badge>
@@ -440,7 +406,7 @@ function FactCard({
   children?: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl bg-card border border-border/60 p-4 shadow-sm">
+    <div className="rounded-xl bg-card border border-border/60 p-4 shadow-executive hover:shadow-executive-md transition-all duration-300">
       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">{label}</p>
       {children || <p className="text-sm font-medium text-foreground">{value}</p>}
     </div>
@@ -458,7 +424,7 @@ function ServiceCategory({
 }) {
   const isTech = variant === "tech"
   return (
-    <div className={`rounded-xl p-4 ${
+    <div className={`rounded-xl p-4 shadow-executive ${
       isTech
         ? "bg-brand-orange/5 border border-brand-orange/20"
         : "bg-muted/50 border border-border/40"
@@ -479,6 +445,23 @@ function ServiceCategory({
           </li>
         ))}
       </ul>
+    </div>
+  )
+}
+
+function LogoWithSkeleton({ domain, name, size }: { domain: string; name: string; size: number }) {
+  const [loaded, setLoaded] = useState(false)
+  return (
+    <div className="relative rounded-xl overflow-hidden flex-shrink-0" style={{ width: size, height: size }}>
+      {!loaded && <Skeleton className="absolute inset-0 rounded-xl" />}
+      <Image
+        src={`https://img.logo.dev/${domain}?token=${process.env.NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY}`}
+        alt={`${name} logo`}
+        width={size}
+        height={size}
+        className={`object-contain w-full h-full transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+        onLoad={() => setLoaded(true)}
+      />
     </div>
   )
 }

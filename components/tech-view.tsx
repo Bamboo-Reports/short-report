@@ -4,7 +4,7 @@ import { useMemo, useRef, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Cpu, FileText } from "lucide-react"
-import type { TechStackInfo } from "@/types/dashboard"
+import type { TechStackInfo, AnalystNoteData } from "@/types/dashboard"
 
 const BRAND_PALETTE = [
   "#017ABF",  // brand blue
@@ -28,9 +28,10 @@ function getCategoryColor(category: string, index: number): string {
 
 interface TechViewProps {
   techStack: TechStackInfo[]
+  analystNotes?: AnalystNoteData | null
 }
 
-export function TechView({ techStack }: TechViewProps) {
+export function TechView({ techStack, analystNotes }: TechViewProps) {
   const chartRef = useRef<HTMLDivElement>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const chartInstanceRef = useRef<any>(null)
@@ -159,116 +160,46 @@ export function TechView({ techStack }: TechViewProps) {
     }
   }, [treemapData])
 
-  const analysis = useMemo(() => {
-    const B = ({ children }: { children: React.ReactNode }) => (
-      <span className="font-semibold text-foreground">{children}</span>
-    )
-
-    const totalTools = techStack.length
-    const categories = new Map<string, TechStackInfo[]>()
-    techStack.forEach((t) => {
-      if (!categories.has(t.category)) categories.set(t.category, [])
-      categories.get(t.category)!.push(t)
-    })
-    const totalCategories = categories.size
-    const totalCount = techStack.reduce((sum, t) => sum + t.count, 0)
-
-    // Top category by tool count
-    const sortedCategories = Array.from(categories.entries())
-      .map(([cat, tools]) => ({ cat, toolCount: tools.length, totalCount: tools.reduce((s, t) => s + t.count, 0) }))
-      .sort((a, b) => b.toolCount - a.toolCount)
-    const topCat = sortedCategories[0]
-
-    // Top tool by count
-    const topTool = [...techStack].sort((a, b) => b.count - a.count)[0]
-
-    // Company name
-    const companyName = techStack[0]?.company || "The organization"
-
-    const summary = (
-      <>
-        {companyName}&apos;s technology footprint spans <B>{totalTools} tools</B> across{" "}
-        <B>{totalCategories} categories</B>, with a combined adoption score of <B>{totalCount}</B>.
-        {topCat && <>{" "}The heaviest investment is in <B>{topCat.cat}</B> ({topCat.toolCount} tools), reflecting the organization&apos;s core technology priorities.</>}
-      </>
-    )
-
-    const bullets: React.ReactNode[] = []
-
-    // Bullet 1: Dominant category
-    if (topCat) {
-      const topCatPct = totalTools > 0 ? Math.round((topCat.toolCount / totalTools) * 100) : 0
-      bullets.push(
-        <><B>{topCat.cat}</B> accounts for <B>{topCatPct}%</B> of the technology stack with <B>{topCat.toolCount} tools</B>.
-          {topCatPct >= 40
-            ? " This heavy concentration signals a core competency area — any vendor in this space faces an entrenched ecosystem."
-            : " A balanced distribution across categories suggests a diversified technology strategy."}
-        </>
-      )
-    }
-
-    // Bullet 2: Top tool
-    if (topTool) {
-      bullets.push(
-        <><B>{topTool.tool}</B> leads adoption with a score of <B>{topTool.count}</B> in the <B>{topTool.category}</B> category, indicating it is a foundational technology in the stack with deep organizational dependency.</>
-      )
-    }
-
-    // Bullet 3: Stack breadth
-    if (sortedCategories.length >= 3) {
-      const top3 = sortedCategories.slice(0, 3)
-      bullets.push(
-        <>The top 3 categories — {top3.map((c, i) => (
-          <span key={c.cat}>{i > 0 && (i === 2 ? ", and " : ", ")}<B>{c.cat}</B> ({c.toolCount})</span>
-        ))} — cover <B>{Math.round((top3.reduce((s, c) => s + c.toolCount, 0) / totalTools) * 100)}%</B> of all tools, revealing where budget and engineering effort are concentrated.</>
-      )
-    }
-
-    return { summary, bullets }
-  }, [techStack])
-
   return (
-    <div className="px-6 sm:px-8 py-6 space-y-6">
+    <div className="px-6 sm:px-8 py-6 space-y-6 animate-fade-in-up">
       {/* Analyst Overview */}
-      <Card className="border-border/60 shadow-sm">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
-            <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
-              <FileText className="w-4 h-4 text-brand-orange" />
-            </div>
-            Analyst Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-foreground/80 leading-relaxed mb-4">
-            {analysis.summary}
-          </p>
-          <div className="space-y-2.5">
-            {analysis.bullets.map((bullet, idx) => (
-              <div key={idx} className="flex items-start gap-2.5">
-                <div
-                  className={`w-1.5 h-1.5 rounded-full mt-[7px] flex-shrink-0 ${
-                    idx % 2 === 0 ? "bg-brand-blue" : "bg-brand-orange"
-                  }`}
-                />
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  {bullet}
-                </p>
+      {analystNotes && analystNotes.notes.length > 0 && (
+        <Card className="card-accent-orange shadow-executive">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
+              <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
+                <FileText className="w-4 h-4 text-brand-orange" />
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              Analyst Overview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2.5">
+              {analystNotes.notes.map((note, idx) => (
+                <div key={idx} className="flex items-start gap-2.5">
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full mt-[7px] flex-shrink-0 ${
+                      idx % 2 === 0 ? "bg-brand-blue" : "bg-brand-orange"
+                    }`}
+                  />
+                  <p className="text-sm text-foreground/80 leading-relaxed">{note}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Treemap Card */}
-      <Card className="border-border/60 shadow-sm">
+      <Card className="shadow-executive">
+        <div className="h-0.5 bg-gradient-to-r from-brand-blue via-brand-orange to-brand-blue-light" />
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
             <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
               <Cpu className="w-4 h-4 text-brand-blue" />
             </div>
             Technology Landscape
-            <Badge variant="outline" className="ml-2 text-xs border-border/60 text-muted-foreground font-normal">
+            <Badge variant="outline" className="ml-2 text-xs bg-muted/50 text-muted-foreground border-border/40 font-normal px-2.5 py-0.5">
               {techStack.length} tools &middot; {new Set(techStack.map(t => t.category)).size} categories &middot; {techStack.reduce((sum, t) => sum + t.count, 0)} total
             </Badge>
           </CardTitle>

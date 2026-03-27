@@ -1,21 +1,30 @@
 "use client"
 
+import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import type { DealInfo } from "@/types/dashboard"
 import { ArrowRight, MapPin, Briefcase, Layers, Calendar } from "lucide-react"
 
 function PartnerLogo({ domain, size = 28 }: { domain: string; size?: number }) {
   const cleanDomain = domain.replace(/^(https?:\/\/)?(www\.)?/, "").replace(/\/$/, "")
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState(false)
+  if (error) return null
   return (
-    <img
-      src={`https://img.logo.dev/${cleanDomain}?token=${process.env.NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY}&size=64&format=png`}
-      alt={`${cleanDomain} logo`}
-      width={size}
-      height={size}
-      className="rounded-md object-contain flex-shrink-0"
-      onError={(e) => { e.currentTarget.style.display = "none" }}
-    />
+    <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
+      {!loaded && <Skeleton className="absolute inset-0 rounded-md" />}
+      <img
+        src={`https://img.logo.dev/${cleanDomain}?token=${process.env.NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY}&size=64&format=png`}
+        alt={`${cleanDomain} logo`}
+        width={size}
+        height={size}
+        className={`rounded-md object-contain flex-shrink-0 transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+        onLoad={() => setLoaded(true)}
+        onError={() => setError(true)}
+      />
+    </div>
   )
 }
 
@@ -26,12 +35,13 @@ interface DealMagazineProps {
 
 export function DealMagazine({ deals, onSelectDeal }: DealMagazineProps) {
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 stagger-children">
       {deals.map((deal, index) => {
         const isAlternate = index % 2 === 1
 
         return (
-          <Card key={index} className="overflow-hidden hover:shadow-md transition-shadow">
+          <Card key={index} className="overflow-hidden shadow-executive hover:shadow-executive-md transition-all duration-300">
+            <div className={`h-0.5 bg-gradient-to-r ${isAlternate ? 'from-brand-orange via-brand-orange-light to-transparent' : 'from-brand-blue via-brand-blue-light to-transparent'}`} />
             <CardContent className="p-0">
               <div
                 className={`flex flex-col md:flex-row ${
@@ -57,7 +67,7 @@ export function DealMagazine({ deals, onSelectDeal }: DealMagazineProps) {
                       <Badge
                         key={si}
                         variant="outline"
-                        className="text-xs"
+                        className="text-xs border-brand-blue/30 text-brand-blue bg-brand-blue/5 hover:bg-brand-blue/10 transition-colors duration-200"
                       >
                         {s}
                       </Badge>
@@ -66,17 +76,17 @@ export function DealMagazine({ deals, onSelectDeal }: DealMagazineProps) {
 
                   <button
                     onClick={() => onSelectDeal(index)}
-                    className="text-sm text-brand-blue hover:text-brand-blue/80 font-medium inline-flex items-center gap-1.5 transition-colors"
+                    className="text-sm text-brand-blue hover:text-brand-blue/80 font-medium inline-flex items-center gap-1.5 transition-all duration-200 group/btn"
                   >
-                    Read More <ArrowRight className="w-3.5 h-3.5" />
+                    Read More <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform duration-200" />
                   </button>
                 </div>
 
                 {/* Sidebar — narrower side */}
                 <div
-                  className={`flex-[35] bg-muted/30 p-5 md:p-6 border-t md:border-t-0 ${
+                  className={`flex-[35] bg-gradient-to-br from-muted/40 to-muted/20 p-5 md:p-6 border-t md:border-t-0 ${
                     isAlternate ? "md:border-r" : "md:border-l"
-                  }`}
+                  } border-border/40`}
                 >
                   {deal.partnerUrl && (
                     <div className="mb-4">

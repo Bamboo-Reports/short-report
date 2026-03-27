@@ -1,6 +1,7 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
+import { Skeleton } from "@/components/ui/skeleton"
 import type { CenterSnapshot } from "@/types/dashboard"
 
 interface IndiaMapProps {
@@ -10,6 +11,7 @@ interface IndiaMapProps {
 export function IndiaMap({ centers }: IndiaMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<any>(null)
+  const [mapLoaded, setMapLoaded] = useState(false)
 
   useEffect(() => {
     if (!mapContainerRef.current) return
@@ -40,6 +42,7 @@ export function IndiaMap({ centers }: IndiaMapProps) {
 
       map.on("load", () => {
         if (destroyed) return
+        setMapLoaded(true)
 
         // Aggregate centers by location
         interface LocEntry {
@@ -204,10 +207,33 @@ export function IndiaMap({ centers }: IndiaMapProps) {
   }, [centers])
 
   return (
-    <div
-      ref={mapContainerRef}
-      className="w-full h-full rounded-lg overflow-hidden"
-      style={{ minHeight: "280px" }}
-    />
+    <div className="relative w-full h-full" style={{ minHeight: "280px" }}>
+      {!mapLoaded && (
+        <div className="absolute inset-0 rounded-lg overflow-hidden z-10">
+          <Skeleton className="w-full h-full rounded-lg" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Skeleton className="w-3 h-3 rounded-full" />
+                <Skeleton className="w-20 h-3 rounded" />
+              </div>
+              <div className="flex items-center gap-2">
+                <Skeleton className="w-3 h-3 rounded-full" />
+                <Skeleton className="w-16 h-3 rounded" />
+              </div>
+              <div className="flex items-center gap-2">
+                <Skeleton className="w-3 h-3 rounded-full" />
+                <Skeleton className="w-24 h-3 rounded" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      <div
+        ref={mapContainerRef}
+        className={`w-full h-full rounded-lg overflow-hidden transition-opacity duration-500 ${mapLoaded ? "opacity-100" : "opacity-0"}`}
+        style={{ minHeight: "280px" }}
+      />
+    </div>
   )
 }

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { TrendingUp, Loader2 } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
+import { TrendingUp } from "lucide-react"
 import {
   ChartContainer,
   ChartTooltip,
@@ -46,7 +47,8 @@ export function RevenueChart({ ticker }: RevenueChartProps) {
   }, [ticker])
 
   return (
-    <Card className="border-border/60 shadow-sm">
+    <Card className="border-border/60 shadow-executive hover:shadow-executive-md transition-all duration-300">
+      <div className="h-0.5 bg-gradient-to-r from-brand-blue via-brand-blue-light to-transparent" />
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
           <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
@@ -60,9 +62,17 @@ export function RevenueChart({ ticker }: RevenueChartProps) {
       </CardHeader>
       <CardContent>
         {loading && (
-          <div className="flex items-center justify-center h-[220px] text-muted-foreground">
-            <Loader2 className="w-5 h-5 animate-spin mr-2" />
-            <span className="text-sm">Loading market data...</span>
+          <div className="h-[220px] space-y-3">
+            <div className="flex items-end gap-3 h-[180px] px-4">
+              {[40, 55, 45, 70, 60, 80, 65, 75, 85, 70].map((h, i) => (
+                <Skeleton key={i} className="flex-1 rounded-md" style={{ height: `${h}%` }} />
+              ))}
+            </div>
+            <div className="flex justify-between px-4">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Skeleton key={i} className="h-3 w-10" />
+              ))}
+            </div>
           </div>
         )}
 
