@@ -38,10 +38,10 @@ function getBentoSpan(idx: number, total: number): string {
 
 export function OpportunityView({ opportunities, analystNotes }: OpportunityViewProps) {
   return (
-    <div className="px-6 sm:px-8 py-6 space-y-6">
+    <div className="px-6 sm:px-8 py-6 space-y-6 animate-fade-in-up">
       {/* Analyst Overview */}
       {analystNotes && analystNotes.notes.length > 0 && (
-        <Card className="border-border/60 shadow-sm">
+        <Card className="border-border/60 shadow-executive card-accent-orange">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
               <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
@@ -68,7 +68,7 @@ export function OpportunityView({ opportunities, analystNotes }: OpportunityView
       )}
 
       {/* Bento Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
         {opportunities.map((opp, idx) => {
           const Icon = OPPORTUNITY_ICONS[idx % OPPORTUNITY_ICONS.length]
           const color = OPPORTUNITY_COLORS[idx % OPPORTUNITY_COLORS.length]
@@ -77,24 +77,24 @@ export function OpportunityView({ opportunities, analystNotes }: OpportunityView
           return (
             <Card
               key={idx}
-              className={`border-border/60 shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200 ${span}`}
+              className={`border-border/60 shadow-executive overflow-hidden hover:shadow-executive-md transition-shadow duration-200 ${span}`}
             >
-              <div className="h-1" style={{ backgroundColor: color.accent }} />
+              <div className="h-0.5" style={{ background: `linear-gradient(90deg, ${color.accent}, ${color.accent}80)` }} />
               <CardContent className="p-5">
                 <div className="flex items-start gap-4">
-                  <div className={`w-11 h-11 rounded-xl ${color.bg} flex items-center justify-center flex-shrink-0`}>
+                  <div className={`w-12 h-12 rounded-xl shadow-sm ${color.bg} flex items-center justify-center flex-shrink-0`}>
                     <Icon className={`w-5 h-5 ${color.text}`} />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-foreground leading-snug">
+                    <h3 className="text-base font-semibold text-foreground leading-snug tracking-tight">
                       {opp.opportunity}
                     </h3>
 
                     {opp.details.length > 0 && (
                       <div className="mt-3 space-y-2">
                         {opp.details.map((detail, dIdx) => (
-                          <div key={dIdx} className="flex items-start gap-2.5">
+                          <div key={dIdx} className="flex items-start gap-2.5 hover:bg-muted/30 rounded-md px-1 -mx-1 transition-colors duration-200">
                             <div
                               className="w-1.5 h-1.5 rounded-full mt-[7px] flex-shrink-0"
                               style={{ backgroundColor: color.accent }}

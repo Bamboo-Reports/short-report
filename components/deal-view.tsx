@@ -29,6 +29,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { CheckCircle2 } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 import { DealMagazine } from "./deal-view-magazine"
 import type { DealInfo, AnalystNoteData } from "@/types/dashboard"
 
@@ -66,17 +67,22 @@ function groupBySolutionType(deals: DealInfo[]): DealGroup[] {
 
 function PartnerLogo({ domain, size = 28 }: { domain: string; size?: number }) {
   const cleanDomain = domain.replace(/^(https?:\/\/)?(www\.)?/, "").replace(/\/$/, "")
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState(false)
+  if (error) return null
   return (
-    <img
-      src={`https://img.logo.dev/${cleanDomain}?token=${process.env.NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY}&size=64&format=png`}
-      alt={`${cleanDomain} logo`}
-      width={size}
-      height={size}
-      className="rounded-md object-contain flex-shrink-0"
-      onError={(e) => {
-        e.currentTarget.style.display = "none"
-      }}
-    />
+    <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
+      {!loaded && <Skeleton className="absolute inset-0 rounded-md" />}
+      <img
+        src={`https://img.logo.dev/${cleanDomain}?token=${process.env.NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY}&size=64&format=png`}
+        alt={`${cleanDomain} logo`}
+        width={size}
+        height={size}
+        className={`rounded-md object-contain flex-shrink-0 transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+        onLoad={() => setLoaded(true)}
+        onError={() => setError(true)}
+      />
+    </div>
   )
 }
 
@@ -100,10 +106,10 @@ export function DealView({ deals, analystNotes }: DealViewProps) {
   }
 
   return (
-    <div className="px-6 sm:px-8 py-6 space-y-6">
+    <div className="px-6 sm:px-8 py-6 space-y-6 animate-fade-in-up">
       {/* Analyst Overview */}
       {analystNotes && analystNotes.notes.length > 0 && (
-        <Card className="border-border/60 shadow-sm">
+        <Card className="card-accent-orange border-border/60 shadow-sm">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
               <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
@@ -130,14 +136,14 @@ export function DealView({ deals, analystNotes }: DealViewProps) {
       )}
 
       {/* Layout Switcher */}
-      <div className="flex items-center gap-1 p-1 bg-muted/50 rounded-lg w-fit">
+      <div className="flex items-center gap-1 p-1 bg-muted/40 border border-border/40 rounded-lg w-fit">
         {LAYOUT_OPTIONS.map(({ key, label, icon: Icon }) => (
           <button
             key={key}
             onClick={() => setLayout(key)}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
               layout === key
-                ? "bg-background text-foreground shadow-sm"
+                ? "bg-background text-foreground shadow-executive"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -149,7 +155,8 @@ export function DealView({ deals, analystNotes }: DealViewProps) {
 
       {/* Deal Views */}
       {layout === "table" && (
-        <Card className="border-border/60 shadow-sm">
+        <Card className="border-border/60 shadow-executive">
+          <div className="h-0.5 bg-gradient-to-r from-brand-blue via-brand-blue-light to-transparent" />
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
               <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
@@ -164,18 +171,18 @@ export function DealView({ deals, analystNotes }: DealViewProps) {
           <CardContent className="p-0">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/30 hover:bg-muted/30">
-                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground pl-6">Solution Type</TableHead>
-                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Year</TableHead>
-                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Partner Name</TableHead>
-                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Company Entity</TableHead>
-                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Solution</TableHead>
+                <TableRow className="bg-muted/40 hover:bg-muted/40">
+                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80 pl-6">Solution Type</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80">Year</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80">Partner Name</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80">Company Entity</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80">Solution</TableHead>
                   {DEAL_TYPE_COLUMNS.map((col) => (
-                    <TableHead key={col} className="text-xs font-medium uppercase tracking-wider text-muted-foreground text-center">
+                    <TableHead key={col} className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80 text-center">
                       {col.replace(" Deal", "").replace(" Deals", "")}
                     </TableHead>
                   ))}
-                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground text-center pr-6">Details</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider text-muted-foreground/80 text-center pr-6">Details</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -186,7 +193,7 @@ export function DealView({ deals, analystNotes }: DealViewProps) {
                     return (
                       <TableRow
                         key={item.originalIndex}
-                        className={`group hover:bg-muted/20 transition-colors ${
+                        className={`group hover:bg-muted/20 transition-colors duration-150 ${
                           isLastInGroup && groupIdx < groups.length - 1 ? "border-b-2 border-border" : ""
                         }`}
                       >
@@ -264,7 +271,7 @@ function DealDetailView({
   onNext: () => void
 }) {
   return (
-    <div className="px-6 sm:px-8 py-6 space-y-6">
+    <div className="px-6 sm:px-8 py-6 space-y-6 animate-slide-in-right">
       {/* Back Button + Navigation */}
       <div className="flex items-center justify-between">
         <Button
@@ -307,8 +314,8 @@ function DealDetailView({
       </div>
 
       {/* Deal Header Card */}
-      <Card className="border-border/60 shadow-sm overflow-hidden">
-        <div className="bg-gradient-to-r from-brand-blue/8 to-brand-blue/3 border-b border-border/60 px-6 py-5">
+      <Card className="border-border/60 shadow-executive overflow-hidden">
+        <div className="bg-gradient-to-r from-brand-blue/10 via-brand-blue/5 to-transparent border-b border-border/60 px-6 py-5">
           <div className="flex items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               {deal.partnerUrl && (
@@ -354,7 +361,7 @@ function DealDetailView({
 
       {/* Solutions */}
       {deal.solution.length > 0 && (
-        <Card className="border-border/60 shadow-sm">
+        <Card className="border-border/60 shadow-executive">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
               <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
@@ -369,7 +376,7 @@ function DealDetailView({
                 <Badge
                   key={idx}
                   variant="outline"
-                  className="text-sm px-3 py-1.5 border-brand-blue/30 text-brand-blue bg-brand-blue/5 font-medium"
+                  className="text-sm px-3 py-1.5 border-brand-blue/30 text-brand-blue bg-brand-blue/5 font-medium hover:bg-brand-blue/10 transition-colors duration-200"
                 >
                   {s}
                 </Badge>
@@ -381,7 +388,7 @@ function DealDetailView({
 
       {/* Deal Details */}
       {deal.dealDetails.length > 0 && (
-        <Card className="border-border/60 shadow-sm">
+        <Card className="card-accent-blue border-border/60 shadow-executive">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
               <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
@@ -407,7 +414,7 @@ function DealDetailView({
       {(deal.companyKeyPersons.length > 0 || deal.partnerKeyPersons.length > 0) && (
         <div className={`grid gap-6 ${deal.companyKeyPersons.length > 0 && deal.partnerKeyPersons.length > 0 ? "lg:grid-cols-2" : "grid-cols-1"}`}>
           {deal.companyKeyPersons.length > 0 && (
-            <Card className="border-border/60 shadow-sm">
+            <Card className="card-accent-orange border-border/60 shadow-executive">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
                   <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
@@ -430,7 +437,7 @@ function DealDetailView({
           )}
 
           {deal.partnerKeyPersons.length > 0 && (
-            <Card className="border-border/60 shadow-sm">
+            <Card className="card-accent-orange border-border/60 shadow-executive">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
                   <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
@@ -467,7 +474,7 @@ function FactCard({
   value: string
 }) {
   return (
-    <div className="rounded-xl bg-card border border-border/60 p-4 shadow-sm">
+    <div className="rounded-xl bg-card border border-border/60 p-4 shadow-executive hover:shadow-executive-md transition-all duration-300">
       <div className="flex items-center gap-2 mb-1.5">
         <Icon className="w-3.5 h-3.5 text-muted-foreground" />
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>

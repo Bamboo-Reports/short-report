@@ -1,21 +1,30 @@
 "use client"
 
+import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import type { DealInfo } from "@/types/dashboard"
 import { ArrowRight, Calendar } from "lucide-react"
 
 function PartnerLogo({ domain, size = 28 }: { domain: string; size?: number }) {
   const cleanDomain = domain.replace(/^(https?:\/\/)?(www\.)?/, "").replace(/\/$/, "")
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState(false)
+  if (error) return null
   return (
-    <img
-      src={`https://img.logo.dev/${cleanDomain}?token=${process.env.NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY}&size=64&format=png`}
-      alt={`${cleanDomain} logo`}
-      width={size}
-      height={size}
-      className="rounded-md object-contain flex-shrink-0"
-      onError={(e) => { e.currentTarget.style.display = "none" }}
-    />
+    <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
+      {!loaded && <Skeleton className="absolute inset-0 rounded-md" />}
+      <img
+        src={`https://img.logo.dev/${cleanDomain}?token=${process.env.NEXT_PUBLIC_LOGO_DEV_PUBLISHABLE_KEY}&size=64&format=png`}
+        alt={`${cleanDomain} logo`}
+        width={size}
+        height={size}
+        className={`rounded-md object-contain flex-shrink-0 transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+        onLoad={() => setLoaded(true)}
+        onError={() => setError(true)}
+      />
+    </div>
   )
 }
 

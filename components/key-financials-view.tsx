@@ -40,10 +40,11 @@ export function KeyFinancialsView({ financials }: KeyFinancialsViewProps) {
   const yearCount = revenueData.length
 
   return (
-    <div className="p-6 sm:p-8 space-y-6">
+    <div className="p-6 sm:p-8 space-y-6 animate-fade-in-up">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue Chart */}
-        <Card className="border-border/60 shadow-sm">
+        <Card className="border-border/60 shadow-executive hover:shadow-executive-md transition-all duration-300">
+          <div className="h-0.5 bg-gradient-to-r from-brand-blue to-brand-blue-light rounded-t-lg" />
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
               <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
@@ -112,7 +113,8 @@ export function KeyFinancialsView({ financials }: KeyFinancialsViewProps) {
         </Card>
 
         {/* Income Chart */}
-        <Card className="border-border/60 shadow-sm">
+        <Card className="border-border/60 shadow-executive hover:shadow-executive-md transition-all duration-300">
+          <div className="h-0.5 bg-gradient-to-r from-brand-orange to-brand-orange-light rounded-t-lg" />
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
               <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
@@ -200,11 +202,11 @@ export function KeyFinancialsView({ financials }: KeyFinancialsViewProps) {
             </ChartContainer>
             <div className="flex items-center justify-center gap-6 mt-4">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-sm bg-brand-blue" />
+                <div className="w-3.5 h-2 rounded-sm bg-brand-blue" />
                 <span className="text-xs text-muted-foreground">Net Income</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-sm bg-brand-orange" />
+                <div className="w-3.5 h-2 rounded-sm bg-brand-orange" />
                 <span className="text-xs text-muted-foreground">Operating Income</span>
               </div>
             </div>

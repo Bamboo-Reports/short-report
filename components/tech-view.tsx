@@ -161,10 +161,10 @@ export function TechView({ techStack, analystNotes }: TechViewProps) {
   }, [treemapData])
 
   return (
-    <div className="px-6 sm:px-8 py-6 space-y-6">
+    <div className="px-6 sm:px-8 py-6 space-y-6 animate-fade-in-up">
       {/* Analyst Overview */}
       {analystNotes && analystNotes.notes.length > 0 && (
-        <Card className="border-border/60 shadow-sm">
+        <Card className="card-accent-orange shadow-executive">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
               <div className="w-8 h-8 rounded-lg bg-brand-orange/10 flex items-center justify-center">
@@ -191,14 +191,15 @@ export function TechView({ techStack, analystNotes }: TechViewProps) {
       )}
 
       {/* Treemap Card */}
-      <Card className="border-border/60 shadow-sm">
+      <Card className="shadow-executive">
+        <div className="h-0.5 bg-gradient-to-r from-brand-blue via-brand-orange to-brand-blue-light" />
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2.5 text-base font-semibold text-foreground">
             <div className="w-8 h-8 rounded-lg bg-brand-blue/10 flex items-center justify-center">
               <Cpu className="w-4 h-4 text-brand-blue" />
             </div>
             Technology Landscape
-            <Badge variant="outline" className="ml-2 text-xs border-border/60 text-muted-foreground font-normal">
+            <Badge variant="outline" className="ml-2 text-xs bg-muted/50 text-muted-foreground border-border/40 font-normal px-2.5 py-0.5">
               {techStack.length} tools &middot; {new Set(techStack.map(t => t.category)).size} categories &middot; {techStack.reduce((sum, t) => sum + t.count, 0)} total
             </Badge>
           </CardTitle>
